@@ -1,0 +1,96 @@
+<div class="modal-header export-md-modal-header">
+    <h3 class="modal-title">{{ 'title' | lang: 'ui/dialog/exportMarkdown'}}</h3>
+</div>
+<div class="modal-body export-md-modal-body">
+    <div class="export-md-option">
+        <label class="export-md-label">{{ 'headingLevels' | lang: 'ui/dialog/exportMarkdown'}}</label>
+        <select class="form-control export-md-select" ng-model="options.headingLevels">
+            <option value="1">1 {{ 'level' | lang: 'ui/dialog/exportMarkdown'}}</option>
+            <option value="2">2 {{ 'levels' | lang: 'ui/dialog/exportMarkdown'}}</option>
+            <option value="3">3 {{ 'levels' | lang: 'ui/dialog/exportMarkdown'}}</option>
+            <option value="4">4 {{ 'levels' | lang: 'ui/dialog/exportMarkdown'}}</option>
+            <option value="5">5 {{ 'levels' | lang: 'ui/dialog/exportMarkdown'}}</option>
+            <option value="6">6 {{ 'levels' | lang: 'ui/dialog/exportMarkdown'}}</option>
+        </select>
+        <p class="export-md-hint">{{ 'headingLevelsHint' | lang: 'ui/dialog/exportMarkdown'}}</p>
+    </div>
+    
+    <div class="export-md-option">
+        <label class="export-md-label">{{ 'rootNodeStyle' | lang: 'ui/dialog/exportMarkdown'}}</label>
+        <div class="radio">
+            <label>
+                <input type="radio" ng-model="options.rootAsTitle" ng-value="true">
+                {{ 'rootAsDocTitle' | lang: 'ui/dialog/exportMarkdown'}}
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" ng-model="options.rootAsTitle" ng-value="false">
+                {{ 'rootAsHeading' | lang: 'ui/dialog/exportMarkdown'}}
+            </label>
+        </div>
+    </div>
+    
+    <div class="export-md-option">
+        <label class="export-md-label">{{ 'includeOptions' | lang: 'ui/dialog/exportMarkdown'}}</label>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="options.includeNote">
+                {{ 'includeNote' | lang: 'ui/dialog/exportMarkdown'}}
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="options.includeLink">
+                {{ 'includeLink' | lang: 'ui/dialog/exportMarkdown'}}
+            </label>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">{{ 'cancel' | lang: 'ui/dialog/exportMarkdown'}}</button>
+    <button class="btn btn-primary" ng-click="doExport()">{{ 'export' | lang: 'ui/dialog/exportMarkdown'}}</button>
+</div>
+
+<style>
+.export-md-modal-header {
+    background-color: var(--theme-color, #fc8383);
+    color: white;
+    border-radius: 5px 5px 0 0;
+}
+
+.export-md-modal-header .modal-title {
+    font-weight: normal;
+}
+
+.export-md-modal-body {
+    padding: 20px 30px;
+}
+
+.export-md-option {
+    margin-bottom: 20px;
+}
+
+.export-md-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.export-md-select {
+    width: 150px;
+}
+
+.export-md-hint {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.export-md-option .radio,
+.export-md-option .checkbox {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+</style>

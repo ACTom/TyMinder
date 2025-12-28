@@ -1,0 +1,26 @@
+.window-control-btn {
+    background: transparent;
+    border: none !important;
+    padding: 0 15px;
+    height: 32px;
+    line-height: 32px;
+    color: rgba(255, 255, 255, 0.9);
+    outline: none;
+    transition: background-color 0.2s, color 0.2s;
+    -webkit-app-region: no-drag;
+}
+
+.window-control-btn:hover {
+    background-color: var(--theme-color-hover, #e56b6b);
+    color: #fff;
+}
+
+.window-control-btn.close-btn:hover {
+    background-color: #e81123;
+    color: white;
+}
+
+.window-control-btn .glyphicon {
+    font-size: 10px;
+    top: 0;
+}

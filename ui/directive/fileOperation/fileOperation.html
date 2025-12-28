@@ -1,0 +1,167 @@
+<div class="file-operation-overlay">
+    <div class="file-menu-sidebar">
+        <div class="file-menu-back-btn" ng-click="exit()" title="Back">
+            <span class="glyphicon glyphicon-arrow-left"></span>
+        </div>
+        
+        <div class="file-menu-item" ng-click="newFile()">
+            <span class="glyphicon glyphicon-file"></span> {{ 'new' | lang: 'ui/file' }}
+        </div>
+        <div class="file-menu-item file-menu-item-expandable" ng-class="{'active': activeMenu === 'recent'}">
+            <span class="item-main" ng-click="openFile()">
+                <span class="glyphicon glyphicon-folder-open"></span> {{ 'open' | lang: 'ui/file' }}
+            </span>
+            <span class="item-arrow" ng-click="showRecent(); $event.stopPropagation()" title="{{ 'recentfiles' | lang: 'ui/file' }}">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </span>
+        </div>
+        <div class="file-menu-item" ng-click="saveFile()">
+            <span class="glyphicon glyphicon-floppy-disk"></span> {{ 'save' | lang: 'ui/file' }}
+        </div>
+        <div class="file-menu-item" ng-click="saveAsFile()">
+            <span class="glyphicon glyphicon-floppy-save"></span> {{ 'saveas' | lang: 'ui/file' }}
+        </div>
+        <div class="file-menu-item" ng-class="{'active': activeMenu === 'info'}" ng-click="showInfo()">
+            <span class="glyphicon glyphicon-list-alt"></span> {{ 'info' | lang: 'ui/file' }}
+        </div>
+        
+        <div class="file-menu-separator"></div>
+        
+        <div class="file-menu-item" ng-class="{'active': activeMenu === 'import'}" ng-click="showImport()">
+            <span class="glyphicon glyphicon-import"></span> {{ 'import' | lang: 'ui/file' }}
+        </div>
+        <div class="file-menu-item" ng-class="{'active': activeMenu === 'export'}" ng-click="showExport()">
+            <span class="glyphicon glyphicon-export"></span> {{ 'export' | lang: 'ui/file' }}
+        </div>
+        
+        <div class="file-menu-separator"></div>
+        
+        <div class="file-menu-item" ng-click="showSettings()">
+            <span class="glyphicon glyphicon-cog"></span> {{ 'settings' | lang: 'ui/file' }}
+        </div>
+        <div class="file-menu-item" ng-class="{'active': activeMenu === 'about'}" ng-click="showAbout()">
+            <span class="glyphicon glyphicon-info-sign"></span> {{ 'about' | lang: 'ui/file' }}
+        </div>
+    </div>
+    
+    <!-- 文件信息面板 -->
+    <div class="file-menu-content" ng-show="activeMenu === 'info'">
+        <h2 class="file-menu-title">{{ 'title' | lang: 'ui/fileinfo' }}</h2>
+        
+        <div class="file-info-list">
+            <div class="file-info-item">
+                <span class="file-info-label">{{ 'filename' | lang: 'ui/fileinfo' }}</span>
+                <span class="file-info-value">{{fileInfo.fileName || '-'}}</span>
+            </div>
+            
+            <div class="file-info-item" ng-if="!fileInfo.isNewFile">
+                <span class="file-info-label">{{ 'path' | lang: 'ui/fileinfo' }}</span>
+                <span class="file-info-value file-path" title="{{fileInfo.filePath}}">{{fileInfo.filePath}}</span>
+            </div>
+            
+            <div class="file-info-item" ng-if="!fileInfo.isNewFile">
+                <span class="file-info-label">{{ 'size' | lang: 'ui/fileinfo' }}</span>
+                <span class="file-info-value">{{fileInfo.fileSize || '-'}}</span>
+            </div>
+            
+            <div class="file-info-item" ng-if="!fileInfo.isNewFile">
+                <span class="file-info-label">{{ 'created' | lang: 'ui/fileinfo' }}</span>
+                <span class="file-info-value">{{fileInfo.createdTime || '-'}}</span>
+            </div>
+            
+            <div class="file-info-item" ng-if="!fileInfo.isNewFile">
+                <span class="file-info-label">{{ 'modified' | lang: 'ui/fileinfo' }}</span>
+                <span class="file-info-value">{{fileInfo.modifiedTime || '-'}}</span>
+            </div>
+            
+            <div class="file-info-item" ng-if="fileInfo.isNewFile">
+                <span class="file-info-hint">{{ 'newfilehint' | lang: 'ui/fileinfo' }}</span>
+            </div>
+            
+            <!-- 备份信息（开启自动备份时显示） -->
+            <div class="file-info-section" ng-if="backupEnabled">
+                <div class="file-info-section-title">{{ 'backupinfo' | lang: 'ui/fileinfo' }}</div>
+                
+                <div class="file-info-item">
+                    <span class="file-info-label">{{ 'backupcount' | lang: 'ui/fileinfo' }}</span>
+                    <span class="file-info-value">{{backupInfo.count || 0}}</span>
+                </div>
+                
+                <div class="file-info-item">
+                    <span class="file-info-label">{{ 'backupsize' | lang: 'ui/dialog/settings' }}</span>
+                    <span class="file-info-value file-info-link" ng-click="openBackupDir()">{{backupInfo.sizeDisplay || '0 B'}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导入面板 -->
+    <div class="file-menu-content" ng-show="activeMenu === 'import'">
+        <h2 class="file-menu-title">{{ 'import' | lang: 'ui/file' }}</h2>
+        <p class="file-menu-desc">{{ 'importdesc' | lang: 'ui/file' }}</p>
+        
+        <div class="format-list">
+            <div class="format-item" ng-repeat="fmt in importFormats" ng-click="doImport(fmt)">
+                <span class="format-icon glyphicon" ng-class="fmt.icon"></span>
+                <div class="format-info">
+                    <div class="format-name">{{fmt.name}}</div>
+                    <div class="format-ext">{{fmt.extensions}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导出面板 -->
+    <div class="file-menu-content" ng-show="activeMenu === 'export'">
+        <h2 class="file-menu-title">{{ 'export' | lang: 'ui/file' }}</h2>
+        <p class="file-menu-desc">{{ 'exportdesc' | lang: 'ui/file' }}</p>
+        
+        <div class="format-list">
+            <div class="format-item" ng-repeat="fmt in exportFormats" ng-click="doExport(fmt)">
+                <span class="format-icon glyphicon" ng-class="fmt.icon"></span>
+                <div class="format-info">
+                    <div class="format-name">{{fmt.name}}</div>
+                    <div class="format-ext">{{fmt.extensions}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 关于面板 -->
+    <div class="file-menu-content" ng-show="activeMenu === 'about'">
+        <h2 class="file-menu-title">{{ 'about' | lang: 'ui/file' }}</h2>
+        
+        <div class="about-content">
+            <h3 class="about-app-name">TyMinder</h3>
+            <p class="about-version">{{ 'version' | lang: 'ui/about' }}: 0.1.0</p>
+            <p class="about-desc">{{ 'desc' | lang: 'ui/about' }}</p>
+            <p class="about-website"><a href="https://github.com/ACTom/TyMinder" target="_blank">{{ 'website' | lang: 'ui/about' }}</a></p>
+            <p class="about-copyright">© 2025 <a href="https://github.com/ACTom" target="_blank">ACTom</a> {{ 'copyright' | lang: 'ui/about' }}</p>
+        </div>
+    </div>
+    
+    <!-- 最近打开面板 -->
+    <div class="file-menu-content" ng-show="activeMenu === 'recent'">
+        <div class="file-menu-title-bar">
+            <h2 class="file-menu-title">{{ 'recentfiles' | lang: 'ui/file' }}</h2>
+            <button class="btn-clear-history" ng-click="clearRecentFiles()" ng-show="recentFiles.length > 0" title="{{ 'clearhistory' | lang: 'ui/file' }}">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
+        </div>
+        
+        <div class="recent-file-list" ng-show="recentFiles.length > 0">
+            <div class="recent-file-item" ng-repeat="file in recentFiles" ng-click="openRecentFile(file)" title="{{file.path}}">
+                <span class="recent-file-icon glyphicon glyphicon-file"></span>
+                <div class="recent-file-info">
+                    <div class="recent-file-name">{{file.name}}</div>
+                    <div class="recent-file-path">{{file.path}}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recent-file-empty" ng-show="recentFiles.length === 0">
+            <span class="glyphicon glyphicon-folder-open"></span>
+            <p>{{ 'norecentfiles' | lang: 'ui/file' }}</p>
+        </div>
+    </div>
+</div>

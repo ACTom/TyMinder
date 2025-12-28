@@ -1,0 +1,405 @@
+.file-operation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 99999;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: row;
+    font-family: "Microsoft YaHei", sans-serif;
+}
+
+.file-menu-sidebar {
+    width: 250px;
+    background-color: var(--theme-color, #fc8383);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+}
+
+.file-menu-back-btn {
+    padding: 15px 20px;
+    cursor: pointer;
+    font-size: 24px;
+    transition: background-color 0.2s;
+}
+
+.file-menu-back-btn:hover {
+    background-color: var(--theme-color-hover, #e56b6b);
+}
+
+.file-menu-item {
+    padding: 15px 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.file-menu-item:hover {
+    background-color: var(--theme-color-hover, #e56b6b);
+}
+
+.file-menu-item.active {
+    background-color: var(--theme-color-hover, #e56b6b);
+    border-left-color: #fff;
+}
+
+.file-menu-content {
+    flex: 1;
+    padding: 40px;
+    background-color: #fff;
+}
+
+.file-menu-title {
+    font-size: 24px;
+    color: #444;
+    margin-bottom: 30px;
+    font-weight: normal;
+}
+
+.file-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.file-info-item {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.file-info-label {
+    width: 100px;
+    flex-shrink: 0;
+    color: #888;
+    font-size: 14px;
+}
+
+.file-info-value {
+    flex: 1;
+    color: #333;
+    font-size: 14px;
+    word-break: break-all;
+}
+
+.file-info-value.file-path {
+    font-family: Consolas, monospace;
+    font-size: 13px;
+    color: #666;
+    max-width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-info-hint {
+    color: #999;
+    font-size: 14px;
+    font-style: italic;
+}
+
+// 备份信息区域
+.file-info-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.file-info-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.file-info-link {
+    color: var(--theme-color, #fc8383);
+    cursor: pointer;
+    text-decoration: underline;
+    
+    &:hover {
+        color: var(--theme-color-hover, #e77070);
+    }
+}
+
+// 分隔符
+.file-menu-separator {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 10px 15px;
+}
+
+// 导入/导出格式列表
+.file-menu-desc {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.format-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.format-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #eee;
+}
+
+.format-item:hover {
+    background-color: var(--theme-color, #fc8383);
+    color: white;
+    border-color: var(--theme-color, #fc8383);
+}
+
+.format-item:hover .format-ext {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.format-icon {
+    font-size: 24px;
+    margin-right: 16px;
+    width: 32px;
+    text-align: center;
+}
+
+.format-info {
+    flex: 1;
+}
+
+.format-name {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.format-ext {
+    font-size: 12px;
+    color: #999;
+}
+
+// 关于页面
+.about-content {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.about-app-name {
+    font-size: 32px;
+    color: var(--theme-color, #fc8383);
+    margin-bottom: 10px;
+}
+
+.about-version {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.about-desc {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.about-copyright {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.about-website {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.about-website a {
+    color: var(--theme-color, #fc8383);
+    text-decoration: none;
+}
+
+.about-website a:hover {
+    text-decoration: underline;
+}
+
+// 可展开的菜单项（带箭头）
+.file-menu-item-expandable {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    position: relative;
+    
+    .item-main {
+        flex: 1;
+        padding: 15px 15px 15px 25px;
+        cursor: pointer;
+    }
+    
+    .item-arrow {
+        padding: 15px 20px;
+        cursor: pointer;
+        
+        .glyphicon {
+            font-size: 12px;
+        }
+    }
+    
+    // 默认状态：分隔线透明
+    .item-arrow::before {
+        content: '';
+        position: absolute;
+        left: auto;
+        right: 50px;
+        top: 10px;
+        bottom: 10px;
+        width: 1px;
+        background-color: transparent;
+        transition: background-color 0.2s;
+    }
+    
+    // hover 状态：显示分隔线
+    &:hover {
+        .item-arrow::before {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .item-arrow:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .item-main:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+    }
+}
+
+// 标题栏（带清空按钮）
+.file-menu-title-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    
+    .file-menu-title {
+        margin-bottom: 0;
+    }
+}
+
+.btn-clear-history {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover {
+        background-color: #ff6b6b;
+        border-color: #ff6b6b;
+        color: white;
+    }
+    
+    .glyphicon {
+        font-size: 14px;
+    }
+}
+
+// 最近文件列表
+.recent-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: ~"calc(100vh - 200px)";
+    overflow-y: auto;
+}
+
+.recent-file-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 14px 16px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #eee;
+    
+    &:hover {
+        background-color: var(--theme-color, #fc8383);
+        color: white;
+        border-color: var(--theme-color, #fc8383);
+        
+        .recent-file-path {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .recent-file-icon {
+            color: white;
+        }
+    }
+}
+
+.recent-file-icon {
+    font-size: 20px;
+    margin-right: 14px;
+    color: var(--theme-color, #fc8383);
+}
+
+.recent-file-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.recent-file-name {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-file-path {
+    font-size: 12px;
+    color: #999;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// 空状态
+.recent-file-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    
+    .glyphicon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+    
+    p {
+        font-size: 14px;
+    }
+}

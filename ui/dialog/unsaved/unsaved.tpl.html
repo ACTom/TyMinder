@@ -1,0 +1,34 @@
+<div class="modal-header unsaved-modal-header">
+    <h3 class="modal-title">{{ 'title' | lang: 'ui/dialog/unsaved'}}</h3>
+</div>
+<div class="modal-body unsaved-modal-body">
+    <p class="unsaved-message">{{ 'message' | lang: 'ui/dialog/unsaved'}}</p>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="save()">{{ 'save' | lang: 'ui/dialog/unsaved'}}</button>
+    <button class="btn btn-default" ng-click="dontSave()">{{ 'dontsave' | lang: 'ui/dialog/unsaved'}}</button>
+    <button class="btn btn-default" ng-click="cancel()">{{ 'cancel' | lang: 'ui/dialog/unsaved'}}</button>
+</div>
+
+<style>
+.unsaved-modal-header {
+    background-color: var(--theme-color, #fc8383);
+    color: white;
+    border-radius: 5px 5px 0 0;
+}
+
+.unsaved-modal-header .modal-title {
+    font-weight: normal;
+}
+
+.unsaved-modal-body {
+    padding: 30px 40px;
+    text-align: center;
+}
+
+.unsaved-message {
+    font-size: 16px;
+    color: #555;
+    margin: 0;
+}
+</style>
