@@ -1,6 +1,16 @@
 angular.module('kityminderEditor').run(['$templateCache', function($templateCache) {
   'use strict';
 
+  $templateCache.put('ui/directive/aiChatPanel/aiChatPanel.html',
+    "<div class=\"ai-chat-panel panel panel-default\" ng-show=\"panelOpen\"><div class=\"panel-heading\"><h3 class=\"panel-title\">{{ 'title' | lang: 'ui/aichat' }}</h3><div class=\"panel-actions\"><i class=\"glyphicon glyphicon-trash clear-btn\" ng-click=\"clearMessages()\" title=\"{{ 'clear' | lang: 'ui/aichat' }}\"></i> <i class=\"glyphicon glyphicon-remove close-btn\" ng-click=\"closePanel()\"></i></div></div><div class=\"panel-body\"><div class=\"ai-chat-not-configured\" ng-show=\"!aiConfigured\"><span class=\"glyphicon glyphicon-info-sign\"></span><p>{{ 'notconfigured' | lang: 'ui/aichat' }}</p></div><div class=\"ai-chat-messages\" ng-show=\"aiConfigured\"><div class=\"chat-message assistant\" ng-show=\"messages.length === 0\"><div class=\"message-avatar\"><span class=\"glyphicon glyphicon-flash\"></span></div><div class=\"message-content\"><p>{{ 'welcome' | lang: 'ui/aichat' }}</p></div></div><div class=\"chat-message\" ng-repeat=\"msg in messages\" ng-class=\"msg.role\"><div class=\"message-avatar\"><span class=\"glyphicon\" ng-class=\"{'glyphicon-user': msg.role === 'user', 'glyphicon-flash': msg.role === 'assistant', 'glyphicon-warning-sign': msg.role === 'error'}\"></span></div><div class=\"message-content\"><p ng-if=\"msg.role === 'user'\" ng-bind-html=\"msg.content | nl2br\"></p><div ng-if=\"msg.role !== 'user'\" class=\"markdown-body\" ng-bind-html=\"msg.content | markdown\"></div></div></div><div class=\"chat-message assistant loading\" ng-show=\"loading\"><div class=\"message-avatar\"><span class=\"glyphicon glyphicon-flash\"></span></div><div class=\"message-content\"><span class=\"typing-indicator\"><span></span><span></span><span></span></span></div></div></div><div class=\"ai-chat-input\" ng-show=\"aiConfigured\"><textarea ng-model=\"userInput\" ng-keypress=\"onKeypress($event)\" placeholder=\"{{ 'inputhint' | lang: 'ui/aichat' }}\" ng-disabled=\"loading\"></textarea><button class=\"btn btn-primary send-btn\" ng-click=\"sendMessage()\" ng-disabled=\"loading || !userInput.trim()\"><span class=\"glyphicon glyphicon-send\"></span></button></div></div></div>"
+  );
+
+
+  $templateCache.put('ui/directive/aiTab/aiTab.html',
+    "<div class=\"ai-tab-container\"><div class=\"km-btn-group ai-generate-group\"><div class=\"km-btn-item ai-generate\" ng-class=\"{'disabled': !aiConfigured}\" ng-click=\"showAIGenerate()\" title=\"{{ 'aigenerate' | lang:'ui/aitab' }}\"><i class=\"km-btn-icon\"></i> <span class=\"km-btn-caption\">{{ 'aigenerate' | lang:'ui/aitab' }}</span></div></div><div class=\"km-btn-group ai-chat-group\"><div class=\"km-btn-item ai-chat\" ng-class=\"{'disabled': !aiConfigured}\" ng-click=\"showAIChat()\" title=\"{{ 'aichat' | lang:'ui/aitab' }}\"><i class=\"km-btn-icon\"></i> <span class=\"km-btn-caption\">{{ 'aichat' | lang:'ui/aitab' }}</span></div></div><div class=\"km-btn-group ai-export-group\"><div class=\"km-btn-item ai-export-article\" ng-class=\"{'disabled': !aiConfigured}\" ng-click=\"showAIExportArticle()\" title=\"{{ 'aiexportarticle' | lang:'ui/aitab' }}\"><i class=\"km-btn-icon\"></i> <span class=\"km-btn-caption\">{{ 'aiexportarticle' | lang:'ui/aitab' }}</span></div><div class=\"km-btn-item ai-export-report\" ng-class=\"{'disabled': !aiConfigured}\" ng-click=\"showAIExportReport()\" title=\"{{ 'aiexportreport' | lang:'ui/aitab' }}\"><i class=\"km-btn-icon\"></i> <span class=\"km-btn-caption\">{{ 'aiexportreport' | lang:'ui/aitab' }}</span></div><div class=\"km-btn-item ai-export-ppt\" ng-class=\"{'disabled': !aiConfigured}\" ng-click=\"showAIExportPPT()\" title=\"{{ 'aiexportppt' | lang:'ui/aitab' }}\"><i class=\"km-btn-icon\"></i> <span class=\"km-btn-caption\">{{ 'aiexportppt' | lang:'ui/aitab' }}</span></div></div><div class=\"ai-config-hint\" ng-show=\"!aiConfigured\"><span class=\"glyphicon glyphicon-info-sign\"></span> <span>{{ 'notconfigured' | lang:'ui/aitab' }}</span></div></div>"
+  );
+
+
   $templateCache.put('ui/directive/appendNode/appendNode.html',
     "<div class=\"km-btn-group append-group\"><div class=\"km-btn-item append-child-node\" ng-disabled=\"minder.queryCommandState('AppendChildNode') === -1\" ng-click=\"minder.queryCommandState('AppendChildNode') === -1 || execCommand('AppendChildNode')\" title=\"{{ 'appendchildnode' | lang:'ui/command' }}\"><i class=\"km-btn-icon\"></i> <span class=\"km-btn-caption\">{{ 'appendchildnode' | lang:'ui/command' }}</span></div><div class=\"km-btn-item append-parent-node\" ng-disabled=\"minder.queryCommandState('AppendParentNode') === -1\" ng-click=\"minder.queryCommandState('AppendParentNode') === -1 || execCommand('AppendParentNode')\" title=\"{{ 'appendparentnode' | lang:'ui/command' }}\"><i class=\"km-btn-icon\"></i> <span class=\"km-btn-caption\">{{ 'appendparentnode' | lang:'ui/command' }}</span></div><div class=\"km-btn-item append-sibling-node\" ng-disabled=\"minder.queryCommandState('AppendSiblingNode') === -1\" ng-click=\"minder.queryCommandState('AppendSiblingNode') === -1 ||execCommand('AppendSiblingNode')\" title=\"{{ 'appendsiblingnode' | lang:'ui/command' }}\"><i class=\"km-btn-icon\"></i> <span class=\"km-btn-caption\">{{ 'appendsiblingnode' | lang:'ui/command' }}</span></div></div>"
   );
@@ -65,7 +75,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/kityminderEditor/kityminderEditor.html',
-    "<div class=\"minder-editor-container\"><div class=\"top-tab\" top-tab=\"minder\" editor=\"editor\" ng-if=\"minder\"></div><div search-box minder=\"minder\" ng-if=\"minder\"></div><div class=\"minder-editor\"></div><div class=\"km-note\" note-editor minder=\"minder\" ng-if=\"minder\"></div><div class=\"note-previewer\" note-previewer ng-if=\"minder\"></div><div class=\"navigator\" navigator minder=\"minder\" ng-if=\"minder\"></div><context-menu minder=\"minder\" ng-if=\"minder\"></context-menu></div>"
+    "<div class=\"minder-editor-container\"><div class=\"top-tab\" top-tab=\"minder\" editor=\"editor\" ng-if=\"minder\"></div><div search-box minder=\"minder\" ng-if=\"minder\"></div><div class=\"minder-editor\"></div><div class=\"km-note\" note-editor minder=\"minder\" ng-if=\"minder\"></div><div class=\"ai-chat-panel-container\" ai-chat-panel minder=\"minder\" ng-if=\"minder\"></div><div class=\"note-previewer\" note-previewer ng-if=\"minder\"></div><div class=\"navigator\" navigator minder=\"minder\" ng-if=\"minder\"></div><context-menu minder=\"minder\" ng-if=\"minder\"></context-menu><div class=\"ai-rewrite-overlay\" ai-rewrite-overlay ng-if=\"minder\"></div></div>"
   );
 
 
@@ -160,12 +170,272 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/topTab/topTab.html',
-    "<div class=\"window-controls-container\" data-tauri-drag-region style=\"position: absolute; top: 0; right: 0; left: 0; height: 32px; z-index: 10000; display: flex; justify-content: flex-end; align-items: flex-start; pointer-events: none\"><div style=\"margin-right: auto; margin-left: auto; height: 32px; font-size: 12px; color: rgba(255,255,255,0.9); display: flex; align-items: center\">{{getTitle()}}</div><div style=\"pointer-events: auto\"><button class=\"window-control-btn minimize-btn\" ng-click=\"minimizeWindow()\"><span class=\"glyphicon glyphicon-minus\"></span></button> <button class=\"window-control-btn maximize-btn\" ng-click=\"maximizeWindow()\"><span class=\"glyphicon\" ng-class=\"{'glyphicon-resize-full': !isMaximized, 'glyphicon-resize-small': isMaximized}\"></span></button> <button class=\"window-control-btn close-btn\" ng-click=\"closeWindow()\"><span class=\"glyphicon glyphicon-remove\"></span></button></div></div><uib-tabset><uib-tab active=\"tabStatus.file\" heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" select=\"setCurTab('file')\"><file-operation minder=\"minder\" exit=\"goBackToIdea()\"></file-operation></uib-tab><uib-tab active=\"tabStatus.idea\" heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></uib-tab><uib-tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></uib-tab><uib-tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></uib-tab></uib-tabset>"
+    "<div class=\"window-controls-container\" data-tauri-drag-region style=\"position: absolute; top: 0; right: 0; left: 0; height: 32px; z-index: 10000; display: flex; justify-content: flex-end; align-items: flex-start; pointer-events: none\"><div style=\"margin-right: auto; margin-left: auto; height: 32px; font-size: 12px; color: rgba(255,255,255,0.9); display: flex; align-items: center\">{{getTitle()}}</div><div style=\"pointer-events: auto\"><button class=\"window-control-btn minimize-btn\" ng-click=\"minimizeWindow()\"><span class=\"glyphicon glyphicon-minus\"></span></button> <button class=\"window-control-btn maximize-btn\" ng-click=\"maximizeWindow()\"><span class=\"glyphicon\" ng-class=\"{'glyphicon-resize-full': !isMaximized, 'glyphicon-resize-small': isMaximized}\"></span></button> <button class=\"window-control-btn close-btn\" ng-click=\"closeWindow()\"><span class=\"glyphicon glyphicon-remove\"></span></button></div></div><uib-tabset><uib-tab active=\"tabStatus.file\" heading=\"{{ 'file' | lang: 'ui/tabs'; }}\" select=\"setCurTab('file')\"><file-operation minder=\"minder\" exit=\"goBackToIdea()\"></file-operation></uib-tab><uib-tab active=\"tabStatus.idea\" heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></uib-tab><uib-tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></uib-tab><uib-tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></uib-tab><uib-tab active=\"tabStatus.ai\" heading=\"{{ 'ai' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('ai')\" select=\"setCurTab('ai')\"><ai-tab minder=\"minder\"></ai-tab></uib-tab></uib-tabset>"
   );
 
 
   $templateCache.put('ui/directive/undoRedo/undoRedo.html',
     "<div class=\"km-btn-group do-group\"><div class=\"km-btn-item undo\" ng-disabled=\"editor.history.hasUndo() == false\" ng-click=\"editor.history.hasUndo() == false || editor.history.undo();\" title=\"{{ 'undo' | lang:'ui' }}\"><i class=\"km-btn-icon\"></i></div><div class=\"km-btn-item redo\" ng-disabled=\"editor.history.hasRedo() == false\" ng-click=\"editor.history.hasRedo() == false || editor.history.redo()\" title=\"{{ 'redo' | lang:'ui' }}\"><i class=\"km-btn-icon\"></i></div></div>"
+  );
+
+
+  $templateCache.put('ui/dialog/aiExport/aiExport.tpl.html',
+    "<div class=\"ai-export-dialog\"><div class=\"modal-header\"><button type=\"button\" class=\"close\" ng-click=\"cancel()\"><span>&times;</span></button><h4 class=\"modal-title\">{{ 'title' | lang: 'ui/dialog/aiexport' }}</h4></div><div class=\"modal-body\"><div ng-hide=\"showResult\"><p class=\"ai-export-hint\">{{ 'selectformat' | lang: 'ui/dialog/aiexport' }}</p><div class=\"ai-export-formats\"><div class=\"ai-export-format-item\" ng-repeat=\"fmt in formats\" ng-class=\"{'selected': selectedFormat === fmt.id}\" ng-click=\"selectedFormat = fmt.id\"><span class=\"glyphicon\" ng-class=\"fmt.icon\"></span> <span class=\"format-name\">{{fmt.name}}</span> <span class=\"glyphicon glyphicon-ok check-icon\" ng-show=\"selectedFormat === fmt.id\"></span></div></div><div class=\"ai-export-desc\"><div ng-show=\"selectedFormat === 'article'\">{{ 'articledesc' | lang: 'ui/dialog/aiexport' }}</div><div ng-show=\"selectedFormat === 'report'\">{{ 'reportdesc' | lang: 'ui/dialog/aiexport' }}</div><div ng-show=\"selectedFormat === 'outline'\">{{ 'outlinedesc' | lang: 'ui/dialog/aiexport' }}</div></div></div><div ng-show=\"showResult\"><div class=\"ai-export-result-header\"><button class=\"btn btn-sm btn-default\" ng-click=\"back()\"><span class=\"glyphicon glyphicon-arrow-left\"></span> {{ 'back' | lang: 'ui/dialog/aiexport' }}</button></div><div class=\"ai-export-result\"><textarea class=\"ai-export-textarea\" readonly>{{result}}</textarea></div></div><div class=\"ai-export-loading\" ng-show=\"loading\"><span class=\"glyphicon glyphicon-refresh spinning\"></span> <span>{{ 'generating' | lang: 'ui/dialog/aiexport' }}</span></div></div><div class=\"modal-footer\"><div ng-hide=\"showResult\"><button class=\"btn btn-default\" ng-click=\"cancel()\">{{ 'cancel' | lang: 'ui/dialog/aiexport' }}</button> <button class=\"btn btn-primary\" ng-click=\"generate()\" ng-disabled=\"loading\"><span ng-hide=\"loading\">{{ 'generate' | lang: 'ui/dialog/aiexport' }}</span> <span ng-show=\"loading\">{{ 'generating' | lang: 'ui/dialog/aiexport' }}</span></button></div><div ng-show=\"showResult\"><button class=\"btn btn-default\" ng-click=\"cancel()\">{{ 'close' | lang: 'ui/dialog/aiexport' }}</button> <button class=\"btn btn-default\" ng-click=\"copyToClipboard()\"><span class=\"glyphicon glyphicon-copy\"></span> {{ 'copy' | lang: 'ui/dialog/aiexport' }}</button> <button class=\"btn btn-primary\" ng-click=\"saveToFile()\"><span class=\"glyphicon glyphicon-save\"></span> {{ 'save' | lang: 'ui/dialog/aiexport' }}</button></div></div></div><style>.ai-export-dialog .ai-export-hint {\r" +
+    "\n" +
+    "    color: #666;\r" +
+    "\n" +
+    "    margin-bottom: 15px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-formats {\r" +
+    "\n" +
+    "    display: flex;\r" +
+    "\n" +
+    "    gap: 15px;\r" +
+    "\n" +
+    "    margin-bottom: 20px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-format-item {\r" +
+    "\n" +
+    "    flex: 1;\r" +
+    "\n" +
+    "    padding: 20px 15px;\r" +
+    "\n" +
+    "    border: 2px solid #ddd;\r" +
+    "\n" +
+    "    border-radius: 8px;\r" +
+    "\n" +
+    "    text-align: center;\r" +
+    "\n" +
+    "    cursor: pointer;\r" +
+    "\n" +
+    "    transition: all 0.2s;\r" +
+    "\n" +
+    "    position: relative;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-format-item:hover {\r" +
+    "\n" +
+    "    border-color: #999;\r" +
+    "\n" +
+    "    background: #f9f9f9;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-format-item.selected {\r" +
+    "\n" +
+    "    border-color: var(--theme-color, #fc8383);\r" +
+    "\n" +
+    "    background: rgba(252, 131, 131, 0.1);\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-format-item .glyphicon:first-child {\r" +
+    "\n" +
+    "    display: block;\r" +
+    "\n" +
+    "    font-size: 28px;\r" +
+    "\n" +
+    "    margin-bottom: 10px;\r" +
+    "\n" +
+    "    color: #666;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-format-item.selected .glyphicon:first-child {\r" +
+    "\n" +
+    "    color: var(--theme-color, #fc8383);\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-format-item .format-name {\r" +
+    "\n" +
+    "    display: block;\r" +
+    "\n" +
+    "    font-size: 14px;\r" +
+    "\n" +
+    "    font-weight: 500;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-format-item .check-icon {\r" +
+    "\n" +
+    "    position: absolute;\r" +
+    "\n" +
+    "    top: 8px;\r" +
+    "\n" +
+    "    right: 8px;\r" +
+    "\n" +
+    "    color: var(--theme-color, #fc8383);\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-desc {\r" +
+    "\n" +
+    "    padding: 12px 15px;\r" +
+    "\n" +
+    "    background: #f5f5f5;\r" +
+    "\n" +
+    "    border-radius: 4px;\r" +
+    "\n" +
+    "    color: #666;\r" +
+    "\n" +
+    "    font-size: 13px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-result {\r" +
+    "\n" +
+    "    margin-top: 10px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-textarea {\r" +
+    "\n" +
+    "    width: 100%;\r" +
+    "\n" +
+    "    height: 350px;\r" +
+    "\n" +
+    "    padding: 12px;\r" +
+    "\n" +
+    "    border: 1px solid #ddd;\r" +
+    "\n" +
+    "    border-radius: 4px;\r" +
+    "\n" +
+    "    font-family: 'Consolas', 'Monaco', monospace;\r" +
+    "\n" +
+    "    font-size: 13px;\r" +
+    "\n" +
+    "    line-height: 1.6;\r" +
+    "\n" +
+    "    resize: none;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-loading {\r" +
+    "\n" +
+    "    text-align: center;\r" +
+    "\n" +
+    "    padding: 40px;\r" +
+    "\n" +
+    "    color: #666;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-loading .glyphicon {\r" +
+    "\n" +
+    "    margin-right: 8px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .spinning {\r" +
+    "\n" +
+    "    animation: spin 1s linear infinite;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "@keyframes spin {\r" +
+    "\n" +
+    "    from { transform: rotate(0deg); }\r" +
+    "\n" +
+    "    to { transform: rotate(360deg); }\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-export-dialog .ai-export-result-header {\r" +
+    "\n" +
+    "    margin-bottom: 10px;\r" +
+    "\n" +
+    "}</style>"
+  );
+
+
+  $templateCache.put('ui/dialog/aiGenerate/aiGenerate.tpl.html',
+    "<div class=\"modal-header ai-generate-header\"><h4 class=\"modal-title\">{{ 'title' | lang: 'ui/dialog/aigenerate' }}</h4></div><div class=\"modal-body ai-generate-body\"><div class=\"form-group\"><label>{{ 'inputlabel' | lang: 'ui/dialog/aigenerate' }}</label><textarea class=\"form-control ai-generate-input\" ng-model=\"topic\" rows=\"5\" placeholder=\"{{ 'placeholder' | lang: 'ui/dialog/aigenerate' }}\" ng-disabled=\"loading\">\r" +
+    "\n" +
+    "        </textarea></div><div class=\"ai-generate-hint\"><i class=\"glyphicon glyphicon-info-sign\"></i> {{ 'hint' | lang: 'ui/dialog/aigenerate' }}</div></div><div class=\"modal-footer\"><button class=\"btn btn-primary\" ng-click=\"generate()\" ng-disabled=\"loading || !topic.trim()\"><span ng-hide=\"loading\">{{ 'generate' | lang: 'ui/dialog/aigenerate' }}</span> <span ng-show=\"loading\">{{ 'generating' | lang: 'ui/dialog/aigenerate' }}</span></button> <button class=\"btn btn-default\" ng-click=\"cancel()\" ng-disabled=\"loading\">{{ 'cancel' | lang: 'ui/dialog/aigenerate' }}</button></div><style>.ai-generate-header {\r" +
+    "\n" +
+    "    background-color: var(--theme-color, #fc8383);\r" +
+    "\n" +
+    "    color: white;\r" +
+    "\n" +
+    "    border-radius: 5px 5px 0 0;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-generate-body {\r" +
+    "\n" +
+    "    padding: 20px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-generate-input {\r" +
+    "\n" +
+    "    resize: vertical;\r" +
+    "\n" +
+    "    min-height: 100px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-generate-hint {\r" +
+    "\n" +
+    "    margin-top: 10px;\r" +
+    "\n" +
+    "    color: #888;\r" +
+    "\n" +
+    "    font-size: 13px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-generate-hint .glyphicon {\r" +
+    "\n" +
+    "    margin-right: 5px;\r" +
+    "\n" +
+    "}</style>"
   );
 
 
@@ -269,7 +539,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/dialog/settings/settings.tpl.html',
-    "<div class=\"modal-header settings-modal-header\"><h3 class=\"modal-title\">{{ 'title' | lang: 'ui/dialog/settings'}}</h3></div><div class=\"modal-body settings-modal-body\"><div class=\"settings-section\"><h4 class=\"settings-section-title\">{{ 'language' | lang: 'ui'}}</h4><div class=\"settings-section-content\"><div class=\"dropdown\" uib-dropdown style=\"display: inline-block\"><button class=\"btn btn-default dropdown-toggle\" uib-dropdown-toggle>{{ getLangLabel(settings.lang) }} <span class=\"caret\"></span></button><ul class=\"dropdown-menu\"><li><a href ng-click=\"selectLang('system')\">{{ 'systemlanguage' | lang: 'ui' }}</a></li><li class=\"divider\"></li><li ng-repeat=\"lang in supportedLangs\"><a href ng-click=\"selectLang(lang.key)\">{{lang.label}}</a></li></ul></div></div></div><div class=\"settings-section\"><h4 class=\"settings-section-title\">{{ 'themecolor' | lang: 'ui/dialog/settings'}}</h4><div class=\"settings-section-content\"><div class=\"theme-color-grid\"><div class=\"theme-color-item\" ng-repeat=\"colorObj in themeColors\" ng-click=\"selectThemeColor(colorObj)\" ng-class=\"{'selected': isColorSelected(colorObj)}\" ng-style=\"{'background-color': colorObj.color}\" title=\"{{colorObj.name}}\"><span class=\"glyphicon glyphicon-ok\" ng-show=\"isColorSelected(colorObj)\"></span></div></div></div></div><div class=\"settings-section\"><h4 class=\"settings-section-title\">{{ 'autobackup' | lang: 'ui/dialog/settings'}}</h4><div class=\"settings-section-content\"><div class=\"settings-row\"><label class=\"settings-checkbox\"><input type=\"checkbox\" ng-model=\"settings.autoBackup\"> <span>{{ 'enableautobackup' | lang: 'ui/dialog/settings'}}</span></label></div><div class=\"settings-row\" ng-show=\"settings.autoBackup\"><label>{{ 'backupinterval' | lang: 'ui/dialog/settings'}}</label><select ng-model=\"settings.backupInterval\" class=\"form-control settings-select\"><option value=\"1\">1 {{ 'minute' | lang: 'ui/dialog/settings'}}</option><option value=\"3\">3 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option><option value=\"5\">5 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option><option value=\"10\">10 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option><option value=\"15\">15 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option><option value=\"30\">30 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option></select></div><div class=\"settings-row\" ng-show=\"settings.autoBackup\"><label class=\"settings-checkbox\"><input type=\"checkbox\" ng-model=\"settings.deleteBackupOnSave\"> <span>{{ 'deletebackuponsave' | lang: 'ui/dialog/settings'}}</span></label></div><div class=\"settings-row backup-info\" ng-show=\"settings.autoBackup\"><span>{{ 'backupsize' | lang: 'ui/dialog/settings'}}</span> <span class=\"backup-size-value\" ng-click=\"openBackupDir()\" title=\"{{ 'clicktoopenbackupdir' | lang: 'ui/dialog/settings'}}\">{{ backupSizeDisplay }}</span></div></div></div></div><div class=\"modal-footer\"><button class=\"btn btn-primary\" ng-click=\"save()\">{{ 'ok' | lang: 'ui/dialog/settings'}}</button> <button class=\"btn btn-default\" ng-click=\"cancel()\">{{ 'cancel' | lang: 'ui/dialog/settings'}}</button></div><style>.settings-modal-header {\r" +
+    "<div class=\"modal-header settings-modal-header\"><h3 class=\"modal-title\">{{ 'title' | lang: 'ui/dialog/settings'}}</h3></div><div class=\"modal-body settings-modal-body\"><ul class=\"nav nav-tabs settings-tabs\"><li ng-class=\"{'active': activeTab === 'general'}\"><a href ng-click=\"setActiveTab('general')\">{{ 'general' | lang: 'ui/dialog/settings'}}</a></li><li ng-class=\"{'active': activeTab === 'ai'}\"><a href ng-click=\"setActiveTab('ai')\">{{ 'ai' | lang: 'ui/dialog/settings'}}</a></li></ul><div class=\"tab-content settings-tab-content\"><div class=\"tab-pane\" ng-class=\"{'active': activeTab === 'general'}\"><div class=\"settings-section\"><h4 class=\"settings-section-title\">{{ 'language' | lang: 'ui'}}</h4><div class=\"settings-section-content\"><div class=\"dropdown\" uib-dropdown style=\"display: inline-block\"><button class=\"btn btn-default dropdown-toggle\" uib-dropdown-toggle>{{ getLangLabel(settings.lang) }} <span class=\"caret\"></span></button><ul class=\"dropdown-menu\"><li><a href ng-click=\"selectLang('system')\">{{ 'systemlanguage' | lang: 'ui' }}</a></li><li class=\"divider\"></li><li ng-repeat=\"lang in supportedLangs\"><a href ng-click=\"selectLang(lang.key)\">{{lang.label}}</a></li></ul></div></div></div><div class=\"settings-section\"><h4 class=\"settings-section-title\">{{ 'themecolor' | lang: 'ui/dialog/settings'}}</h4><div class=\"settings-section-content\"><div class=\"theme-color-grid\"><div class=\"theme-color-item\" ng-repeat=\"colorObj in themeColors\" ng-click=\"selectThemeColor(colorObj)\" ng-class=\"{'selected': isColorSelected(colorObj)}\" ng-style=\"{'background-color': colorObj.color}\" title=\"{{colorObj.name}}\"><span class=\"glyphicon glyphicon-ok\" ng-show=\"isColorSelected(colorObj)\"></span></div></div></div></div><div class=\"settings-section\"><h4 class=\"settings-section-title\">{{ 'autobackup' | lang: 'ui/dialog/settings'}}</h4><div class=\"settings-section-content\"><div class=\"settings-row\"><label class=\"settings-checkbox\"><input type=\"checkbox\" ng-model=\"settings.autoBackup\"> <span>{{ 'enableautobackup' | lang: 'ui/dialog/settings'}}</span></label></div><div class=\"settings-row\" ng-show=\"settings.autoBackup\"><label>{{ 'backupinterval' | lang: 'ui/dialog/settings'}}</label><select ng-model=\"settings.backupInterval\" class=\"form-control settings-select\"><option value=\"1\">1 {{ 'minute' | lang: 'ui/dialog/settings'}}</option><option value=\"3\">3 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option><option value=\"5\">5 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option><option value=\"10\">10 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option><option value=\"15\">15 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option><option value=\"30\">30 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option></select></div><div class=\"settings-row\" ng-show=\"settings.autoBackup\"><label class=\"settings-checkbox\"><input type=\"checkbox\" ng-model=\"settings.deleteBackupOnSave\"> <span>{{ 'deletebackuponsave' | lang: 'ui/dialog/settings'}}</span></label></div><div class=\"settings-row backup-info\" ng-show=\"settings.autoBackup\"><span>{{ 'backupsize' | lang: 'ui/dialog/settings'}}</span> <span class=\"backup-size-value\" ng-click=\"openBackupDir()\" title=\"{{ 'clicktoopenbackupdir' | lang: 'ui/dialog/settings'}}\">{{ backupSizeDisplay }}</span></div></div></div></div><div class=\"tab-pane\" ng-class=\"{'active': activeTab === 'ai'}\"><div class=\"settings-section\"><h4 class=\"settings-section-title\">{{ 'aiprovider' | lang: 'ui/dialog/settings'}}</h4><div class=\"settings-section-content\"><div class=\"dropdown\" uib-dropdown style=\"display: inline-block\"><button class=\"btn btn-default dropdown-toggle\" uib-dropdown-toggle>{{ getProviderLabel(aiSettings.provider) }} <span class=\"caret\"></span></button><ul class=\"dropdown-menu\"><li ng-repeat=\"p in aiProviders\"><a href ng-click=\"selectProvider(p.key)\">{{p.label}}</a></li></ul></div></div></div><div class=\"settings-section\"><h4 class=\"settings-section-title\">API Key</h4><div class=\"settings-section-content\"><div class=\"settings-row\"><input type=\"password\" class=\"form-control settings-input\" ng-model=\"aiSettings.apiKey\" placeholder=\"{{ aiSettings.hasApiKey ? '••••••••••••••••' : 'sk-...' }}\"> <button class=\"btn btn-sm btn-default\" ng-click=\"testAiConfig()\" ng-disabled=\"aiTesting\"><span ng-hide=\"aiTesting\">{{ 'testapikey' | lang: 'ui/dialog/settings'}}</span> <span ng-show=\"aiTesting\">{{ 'testing' | lang: 'ui/dialog/settings'}}</span></button></div><div class=\"settings-row ai-test-result\" ng-show=\"aiTestResult\"><span ng-class=\"{'text-success': aiTestSuccess, 'text-danger': !aiTestSuccess}\">{{ aiTestResult }}</span></div><div class=\"settings-row ai-config-status\"><span ng-if=\"aiSettings.testPassed\" class=\"text-success\"><i class=\"glyphicon glyphicon-ok-circle\"></i> {{ 'aitestpassed' | lang: 'ui/dialog/settings'}}</span> <span ng-if=\"!aiSettings.testPassed && aiSettings.hasApiKey\" class=\"text-warning\"><i class=\"glyphicon glyphicon-exclamation-sign\"></i> {{ 'airequiretest' | lang: 'ui/dialog/settings'}}</span> <span ng-if=\"!aiSettings.hasApiKey\" class=\"text-muted\"><i class=\"glyphicon glyphicon-info-sign\"></i> {{ 'ainotconfigured' | lang: 'ui/dialog/settings'}}</span></div></div></div><div class=\"settings-section\" ng-show=\"aiSettings.provider === 'custom'\"><h4 class=\"settings-section-title\">{{ 'customsettings' | lang: 'ui/dialog/settings'}}</h4><div class=\"settings-section-content\"><div class=\"settings-row\"><label>{{ 'apiurl' | lang: 'ui/dialog/settings'}}</label><input type=\"text\" class=\"form-control settings-input-full\" ng-model=\"aiSettings.apiUrl\" placeholder=\"https://api.example.com/v1/chat/completions\"></div><div class=\"settings-row\"><label>{{ 'modelname' | lang: 'ui/dialog/settings'}}</label><input type=\"text\" class=\"form-control settings-input-full\" ng-model=\"aiSettings.model\" placeholder=\"gpt-4o-mini\"></div></div></div><div class=\"settings-section ai-features-info\"><h4 class=\"settings-section-title\">{{ 'aifeatures' | lang: 'ui/dialog/settings'}}</h4><div class=\"settings-section-content\"><ul class=\"ai-features-list\"><li><i class=\"glyphicon glyphicon-plus\"></i> {{ 'aifeature_expand' | lang: 'ui/dialog/settings'}}</li><li><i class=\"glyphicon glyphicon-edit\"></i> {{ 'aifeature_rewrite' | lang: 'ui/dialog/settings'}}</li><li><i class=\"glyphicon glyphicon-list-alt\"></i> {{ 'aifeature_summarize' | lang: 'ui/dialog/settings'}}</li><li><i class=\"glyphicon glyphicon-tree-conifer\"></i> {{ 'aifeature_generate' | lang: 'ui/dialog/settings'}}</li><li><i class=\"glyphicon glyphicon-comment\"></i> {{ 'aifeature_chat' | lang: 'ui/dialog/settings'}}</li></ul></div></div></div></div></div><div class=\"modal-footer\"><button class=\"btn btn-primary\" ng-click=\"save()\">{{ 'ok' | lang: 'ui/dialog/settings'}}</button> <button class=\"btn btn-default\" ng-click=\"cancel()\">{{ 'cancel' | lang: 'ui/dialog/settings'}}</button></div><style>.settings-modal-header {\r" +
     "\n" +
     "    background-color: var(--theme-color, #fc8383);\r" +
     "\n" +
@@ -291,7 +561,89 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
     "\n" +
     ".settings-modal-body {\r" +
     "\n" +
-    "    padding: 20px 30px;\r" +
+    "    padding: 15px 20px;\r" +
+    "\n" +
+    "    min-height: 400px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".settings-tabs {\r" +
+    "\n" +
+    "    margin-bottom: 15px;\r" +
+    "\n" +
+    "    border-bottom: 2px solid #eee;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".settings-tabs > li > a {\r" +
+    "\n" +
+    "    color: #666;\r" +
+    "\n" +
+    "    border: none;\r" +
+    "\n" +
+    "    padding: 8px 20px;\r" +
+    "\n" +
+    "    margin-right: 5px;\r" +
+    "\n" +
+    "    border-radius: 4px 4px 0 0;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".settings-tabs > li > a:hover {\r" +
+    "\n" +
+    "    background-color: #f5f5f5;\r" +
+    "\n" +
+    "    border: none;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".settings-tabs > li.active > a,\r" +
+    "\n" +
+    ".settings-tabs > li.active > a:hover,\r" +
+    "\n" +
+    ".settings-tabs > li.active > a:focus {\r" +
+    "\n" +
+    "    color: var(--theme-color, #fc8383);\r" +
+    "\n" +
+    "    background-color: transparent;\r" +
+    "\n" +
+    "    border: none;\r" +
+    "\n" +
+    "    border-bottom: 2px solid var(--theme-color, #fc8383);\r" +
+    "\n" +
+    "    margin-bottom: -2px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".settings-tab-content {\r" +
+    "\n" +
+    "    padding: 10px 5px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".tab-pane {\r" +
+    "\n" +
+    "    display: none;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".tab-pane.active {\r" +
+    "\n" +
+    "    display: block;\r" +
     "\n" +
     "}\r" +
     "\n" +
@@ -299,7 +651,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
     "\n" +
     ".settings-section {\r" +
     "\n" +
-    "    margin-bottom: 25px;\r" +
+    "    margin-bottom: 20px;\r" +
     "\n" +
     "}\r" +
     "\n" +
@@ -313,9 +665,9 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
     "\n" +
     "    color: #555;\r" +
     "\n" +
-    "    margin-bottom: 12px;\r" +
+    "    margin-bottom: 10px;\r" +
     "\n" +
-    "    padding-bottom: 8px;\r" +
+    "    padding-bottom: 6px;\r" +
     "\n" +
     "    border-bottom: 1px solid #eee;\r" +
     "\n" +
@@ -333,7 +685,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
     "\n" +
     ".settings-row {\r" +
     "\n" +
-    "    margin-bottom: 12px;\r" +
+    "    margin-bottom: 10px;\r" +
     "\n" +
     "    display: flex;\r" +
     "\n" +
@@ -382,6 +734,26 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
     "    min-width: 120px;\r" +
     "\n" +
     "    display: inline-block;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".settings-input {\r" +
+    "\n" +
+    "    flex: 1;\r" +
+    "\n" +
+    "    max-width: 300px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".settings-input-full {\r" +
+    "\n" +
+    "    flex: 1;\r" +
+    "\n" +
+    "    width: 100%;\r" +
     "\n" +
     "}\r" +
     "\n" +
@@ -480,6 +852,66 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
     "    font-size: 14px;\r" +
     "\n" +
     "    text-shadow: 0 1px 2px rgba(0,0,0,0.3);\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "/* AI 设置样式 */\r" +
+    "\n" +
+    ".ai-test-result {\r" +
+    "\n" +
+    "    font-size: 13px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-features-info {\r" +
+    "\n" +
+    "    background: #f9f9f9;\r" +
+    "\n" +
+    "    padding: 10px;\r" +
+    "\n" +
+    "    border-radius: 4px;\r" +
+    "\n" +
+    "    margin-top: 15px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-features-list {\r" +
+    "\n" +
+    "    list-style: none;\r" +
+    "\n" +
+    "    padding: 0;\r" +
+    "\n" +
+    "    margin: 0;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-features-list li {\r" +
+    "\n" +
+    "    padding: 5px 0;\r" +
+    "\n" +
+    "    color: #666;\r" +
+    "\n" +
+    "    font-size: 13px;\r" +
+    "\n" +
+    "}\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    ".ai-features-list li .glyphicon {\r" +
+    "\n" +
+    "    margin-right: 8px;\r" +
+    "\n" +
+    "    color: var(--theme-color, #fc8383);\r" +
+    "\n" +
+    "    width: 16px;\r" +
     "\n" +
     "}</style>"
   );

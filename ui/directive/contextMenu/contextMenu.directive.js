@@ -3,7 +3,7 @@
  * 替代原有的圆盘 hotbox，提供传统的多级右键菜单
  */
 angular.module('kityminderEditor')
-    .directive('contextMenu', ['$timeout', function($timeout) {
+    .directive('contextMenu', ['$timeout', '$uibModal', 'aiService', 'valueTransfer', function($timeout, $modal, aiService, valueTransfer) {
         return {
             restrict: 'E',
             templateUrl: 'ui/directive/contextMenu/contextMenu.html',
@@ -14,6 +14,15 @@ angular.module('kityminderEditor')
             link: function($scope, element) {
                 var minder = $scope.minder;
                 var lang = window.editor && window.editor.lang ? window.editor.lang.t : function(k) { return k; };
+
+                // AI 加载状态
+                $scope.aiLoading = false;
+                $scope.aiConfigured = false;
+                
+                // 检查 AI 配置
+                aiService.isConfigured().then(function(configured) {
+                    $scope.aiConfigured = configured;
+                });
 
                 // 菜单状态
                 $scope.visible = false;
@@ -145,6 +154,62 @@ angular.module('kityminderEditor')
                             icon: 'glyphicon-paste',
                             shortcut: 'Ctrl+V',
                             action: function() { doPaste(); }
+                        },
+                        { type: 'separator' },
+                        {
+                            id: 'ai',
+                            label: lang('ai', 'ui/contextmenu') || 'AI',
+                            icon: 'glyphicon-flash',
+                            submenu: buildAISubmenu()
+                        }
+                    ];
+                }
+                
+                // 构建 AI 子菜单
+                function buildAISubmenu() {
+                    return [
+                        {
+                            id: 'aiExpand',
+                            label: lang('aiexpand', 'ui/contextmenu') || 'AI 扩展',
+                            icon: 'glyphicon-plus-sign',
+                            action: function() { doAIExpand(); },
+                            enable: function() { return $scope.aiConfigured && !$scope.aiLoading; }
+                        },
+                        {
+                            id: 'aiRewrite',
+                            label: lang('airewrite', 'ui/contextmenu') || 'AI 改写',
+                            icon: 'glyphicon-edit',
+                            submenu: [
+                                {
+                                    id: 'aiRewriteExpand',
+                                    label: lang('airewriteexpand', 'ui/contextmenu') || '扩展',
+                                    action: function() { doAIRewrite('expand'); },
+                                    enable: function() { return $scope.aiConfigured && !$scope.aiLoading; }
+                                },
+                                {
+                                    id: 'aiRewriteSimplify',
+                                    label: lang('airewritesimplify', 'ui/contextmenu') || '精简',
+                                    action: function() { doAIRewrite('simplify'); },
+                                    enable: function() { return $scope.aiConfigured && !$scope.aiLoading; }
+                                },
+                                {
+                                    id: 'aiRewritePolish',
+                                    label: lang('airewritepolish', 'ui/contextmenu') || '润色',
+                                    action: function() { doAIRewrite('polish'); },
+                                    enable: function() { return $scope.aiConfigured && !$scope.aiLoading; }
+                                }
+                            ]
+                        },
+                        {
+                            id: 'aiSummarize',
+                            label: lang('aisummarize', 'ui/contextmenu') || 'AI 总结',
+                            icon: 'glyphicon-list-alt',
+                            action: function() { doAISummarize(); },
+                            enable: function() { 
+                                if (!$scope.aiConfigured || $scope.aiLoading) return false;
+                                var node = minder.getSelectedNode();
+                                return node && node.children && node.children.length > 0;
+                            }
                         }
                     ];
                 }
@@ -207,6 +272,215 @@ angular.module('kityminderEditor')
                 }
 
                 $scope.menuItems = buildMenuItems();
+
+                // ==================== AI 功能实现 ====================
+                
+                // AI 扩展节点
+                function doAIExpand() {
+                    var node = minder.getSelectedNode();
+                    if (!node) return;
+                    
+                    var nodeText = node.data.text;
+                    hideMenu();
+                    
+                    // 获取节点路径
+                    function getNodePath(n) {
+                        var path = [];
+                        var current = n;
+                        while (current) {
+                            if (current.data && current.data.text) {
+                                path.unshift(current.data.text);
+                            }
+                            current = current.parent;
+                        }
+                        return path.join(' > ');
+                    }
+                    
+                    // 获取思维导图的文本内容
+                    function getMapTextContent() {
+                        var root = minder.getRoot();
+                        var lines = [];
+                        function traverse(n, depth) {
+                            if (n.data && n.data.text) {
+                                lines.push('  '.repeat(depth) + '- ' + n.data.text);
+                            }
+                            if (n.children) {
+                                n.children.forEach(function(child) {
+                                    traverse(child, depth + 1);
+                                });
+                            }
+                        }
+                        traverse(root, 0);
+                        return lines.join('\n');
+                    }
+                    
+                    var nodePath = getNodePath(node);
+                    var mapContent = getMapTextContent();
+                    
+                    // 弹出层级选择对话框
+                    var expandModal = $modal.open({
+                        animation: true,
+                        template: '<div class="modal-header" style="background-color: var(--theme-color, #fc8383); color: white;">' +
+                            '<h4 class="modal-title">' + (lang('aiexpand', 'ui/contextmenu') || 'AI 扩展') + '</h4></div>' +
+                            '<div class="modal-body">' +
+                            '<p>' + (lang('aiexpandfor', 'ui/contextmenu') || '根据节点') + '「' + nodeText + '」' + (lang('aiexpandgenerate', 'ui/contextmenu') || '自动生成子节点') + '</p>' +
+                            '<div class="form-group"><label>' + (lang('expandlevels', 'ui/contextmenu') || '扩展层级数') + '：</label>' +
+                            '<select class="form-control" ng-model="levels" style="width: 100px; display: inline-block; margin-left: 10px;" ng-disabled="loading">' +
+                            '<option value="1">1 ' + (lang('layer', 'ui/contextmenu') || '层') + '</option>' +
+                            '<option value="2">2 ' + (lang('layer', 'ui/contextmenu') || '层') + '</option>' +
+                            '<option value="3">3 ' + (lang('layer', 'ui/contextmenu') || '层') + '</option>' +
+                            '<option value="4">4 ' + (lang('layer', 'ui/contextmenu') || '层') + '</option>' +
+                            '<option value="5">5 ' + (lang('layer', 'ui/contextmenu') || '层') + '</option>' +
+                            '</select></div>' +
+                            '<div class="form-group"><label>' + (lang('contentrichness', 'ui/contextmenu') || '内容丰富度') + '：</label>' +
+                            '<select class="form-control" ng-model="richness" style="width: 120px; display: inline-block; margin-left: 10px;" ng-disabled="loading">' +
+                            '<option value="concise">' + (lang('richnessconcise', 'ui/contextmenu') || '精简') + '</option>' +
+                            '<option value="normal">' + (lang('richnessnormal', 'ui/contextmenu') || '正常') + '</option>' +
+                            '<option value="detailed">' + (lang('richnessdetailed', 'ui/contextmenu') || '详细') + '</option>' +
+                            '</select></div>' +
+                            '<div class="checkbox" style="margin-top: 10px;"><label>' +
+                            '<input type="checkbox" ng-model="includeContext" ng-disabled="loading"> ' +
+                            (lang('includemapcontext', 'ui/contextmenu') || '提供完整思维导图作为上下文（推荐，避免生成无关内容）') +
+                            '</label></div>' +
+                            '<div class="alert alert-danger" ng-show="errorMsg" style="margin-top: 10px; margin-bottom: 0;">{{ errorMsg }}</div>' +
+                            '</div>' +
+                            '<div class="modal-footer">' +
+                            '<button class="btn btn-primary" ng-click="ok()" ng-disabled="loading">' +
+                            '<span ng-hide="loading">' + (lang('ok', 'ui/dialog/settings') || '确定') + '</span>' +
+                            '<span ng-show="loading">' + (lang('generating', 'ui/dialog/aigenerate') || '生成中...') + '</span></button>' +
+                            '<button class="btn btn-default" ng-click="cancel()">' + (lang('cancel', 'ui/dialog/settings') || '取消') + '</button></div>',
+                        controller: ['$scope', '$uibModalInstance', function($modalScope, $uibModalInstance) {
+                            $modalScope.levels = '2';
+                            $modalScope.richness = 'normal';
+                            $modalScope.includeContext = true;
+                            $modalScope.loading = false;
+                            $modalScope.errorMsg = '';
+                            
+                            $modalScope.ok = function() {
+                                $modalScope.loading = true;
+                                $modalScope.errorMsg = '';
+                                
+                                var context = $modalScope.includeContext ? mapContent : null;
+                                var path = $modalScope.includeContext ? nodePath : null;
+                                
+                                aiService.expandNode(
+                                    nodeText, 
+                                    parseInt($modalScope.levels), 
+                                    $modalScope.richness,
+                                    context,
+                                    path
+                                ).then(function(result) {
+                                    $uibModalInstance.close({ levels: $modalScope.levels, result: result });
+                                }).catch(function(err) {
+                                    $modalScope.errorMsg = (lang('aiexpandfailed', 'ui/contextmenu') || 'AI 扩展失败') + '：' + err;
+                                    $modalScope.loading = false;
+                                });
+                            };
+                            
+                            $modalScope.cancel = function() {
+                                $uibModalInstance.dismiss('cancel');
+                            };
+                        }],
+                        size: 'md'
+                    });
+                    
+                    expandModal.result.then(function(data) {
+                        // 将 AI 返回的节点添加到当前节点
+                        if (data.result && data.result.children) {
+                            addChildrenToNode(node, data.result.children);
+                            minder.refresh();
+                            minder.fire('contentchange');
+                        }
+                    }).catch(function() {
+                        // 用户取消
+                    });
+                }
+                
+                // 递归添加子节点
+                function addChildrenToNode(parentNode, children) {
+                    if (!children || !children.length) return;
+                    
+                    children.forEach(function(childData) {
+                        var childNode = minder.createNode(childData.text, parentNode);
+                        parentNode.appendChild(childNode);
+                        
+                        if (childData.children && childData.children.length) {
+                            addChildrenToNode(childNode, childData.children);
+                        }
+                    });
+                }
+                
+                // AI 改写节点
+                function doAIRewrite(mode) {
+                    var node = minder.getSelectedNode();
+                    if (!node) return;
+                    
+                    var nodeText = node.data.text;
+                    hideMenu();
+                    
+                    $scope.aiLoading = true;
+                    
+                    // 显示遮罩层
+                    valueTransfer.aiRewriting = true;
+                    valueTransfer.aiRewriteCancel = false;
+                    
+                    aiService.rewriteNode(nodeText, mode).then(function(newText) {
+                        // 检查是否已取消
+                        if (valueTransfer.aiRewriteCancel) {
+                            return;
+                        }
+                        // 更新节点文本
+                        node.setText(newText.trim());
+                        minder.refresh();
+                        minder.fire('contentchange');
+                    }).catch(function(err) {
+                        if (!valueTransfer.aiRewriteCancel) {
+                            alert('AI 改写失败：' + err);
+                        }
+                    }).finally(function() {
+                        $scope.aiLoading = false;
+                        valueTransfer.aiRewriting = false;
+                        if (!$scope.$$phase && !$scope.$root.$$phase) {
+                            $scope.$apply();
+                        }
+                    });
+                }
+                
+                // AI 总结节点
+                function doAISummarize() {
+                    var node = minder.getSelectedNode();
+                    if (!node || !node.children || node.children.length === 0) return;
+                    
+                    hideMenu();
+                    
+                    // 收集所有子节点的文本
+                    var childTexts = [];
+                    function collectTexts(n) {
+                        if (n.data && n.data.text) {
+                            childTexts.push(n.data.text);
+                        }
+                        if (n.children) {
+                            n.children.forEach(collectTexts);
+                        }
+                    }
+                    node.children.forEach(collectTexts);
+                    
+                    $scope.aiLoading = true;
+                    
+                    aiService.summarizeNodes(childTexts).then(function(summary) {
+                        // 更新当前节点的文本为总结内容
+                        node.setText(summary.trim());
+                        minder.refresh();
+                        minder.fire('contentchange');
+                    }).catch(function(err) {
+                        alert('AI 总结失败：' + err);
+                    }).finally(function() {
+                        $scope.aiLoading = false;
+                        if (!$scope.$$phase && !$scope.$root.$$phase) {
+                            $scope.$apply();
+                        }
+                    });
+                }
 
                 // 复制操作 - 使用原生剪贴板事件
                 function doCopy() {

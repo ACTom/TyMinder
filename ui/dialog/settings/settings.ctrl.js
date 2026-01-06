@@ -1,5 +1,12 @@
 angular.module('kityminderEditor')
-    .controller('settings.ctrl', ['$scope', '$uibModalInstance', 'config', 'currentLang', 'langList', 'currentThemeColor', 'systemLangStr', 'backupConfig', function ($scope, $uibModalInstance, config, currentLang, langList, currentThemeColor, systemLangStr, backupConfig) {
+    .controller('settings.ctrl', ['$scope', '$uibModalInstance', 'config', 'currentLang', 'langList', 'currentThemeColor', 'systemLangStr', 'backupConfig', 'aiConfig', function ($scope, $uibModalInstance, config, currentLang, langList, currentThemeColor, systemLangStr, backupConfig, aiConfig) {
+        
+        // 当前激活的标签页
+        $scope.activeTab = 'general';
+        
+        $scope.setActiveTab = function(tab) {
+            $scope.activeTab = tab;
+        };
         
         // 24个预设主题色，按色系排列 (8x3)
         $scope.themeColors = [
@@ -34,6 +41,15 @@ angular.module('kityminderEditor')
             { id: 'darkblue', color: '#34495e', name: 'Dark Blue' }
         ];
 
+        // AI 提供商列表
+        $scope.aiProviders = [
+            { key: 'openai', label: 'OpenAI' },
+            { key: 'claude', label: 'Claude (Anthropic)' },
+            { key: 'qwen', label: '通义千问 (Qwen)' },
+            { key: 'deepseek', label: 'DeepSeek' },
+            { key: 'custom', label: '自定义 (Custom)' }
+        ];
+
         // 当前设置
         $scope.settings = {
             lang: currentLang || 'system',
@@ -42,6 +58,21 @@ angular.module('kityminderEditor')
             backupInterval: String(backupConfig.backupInterval || 5),
             deleteBackupOnSave: backupConfig.deleteBackupOnSave !== false
         };
+
+        // AI 设置
+        $scope.aiSettings = {
+            provider: aiConfig.provider || 'openai',
+            apiKey: '', // 不显示已存储的密钥
+            hasApiKey: aiConfig.hasApiKey || false,
+            testPassed: aiConfig.testPassed || false,
+            apiUrl: aiConfig.apiUrl || '',
+            model: aiConfig.model || ''
+        };
+
+        // AI 测试状态
+        $scope.aiTesting = false;
+        $scope.aiTestResult = '';
+        $scope.aiTestSuccess = false;
 
         // 备份大小显示
         $scope.backupSizeDisplay = '...';
@@ -112,9 +143,26 @@ angular.module('kityminderEditor')
             return key;
         };
 
+        // 获取提供商标签
+        $scope.getProviderLabel = function(key) {
+            for (var i = 0; i < $scope.aiProviders.length; i++) {
+                if ($scope.aiProviders[i].key === key) {
+                    return $scope.aiProviders[i].label;
+                }
+            }
+            return key;
+        };
+
         // 选择语言
         $scope.selectLang = function(lang) {
             $scope.settings.lang = lang;
+        };
+
+        // 选择 AI 提供商
+        $scope.selectProvider = function(provider) {
+            $scope.aiSettings.provider = provider;
+            // 切换提供商时清空测试结果
+            $scope.aiTestResult = '';
         };
 
         // 选择主题色
@@ -125,6 +173,68 @@ angular.module('kityminderEditor')
         // 检查颜色是否选中（忽略大小写）
         $scope.isColorSelected = function(colorObj) {
             return $scope.settings.themeColor.toLowerCase() === colorObj.color.toLowerCase();
+        };
+
+        // 测试 AI 配置
+        $scope.testAiConfig = function() {
+            var tauri = window.__TAURI__ || {};
+            var core = tauri.core || tauri.tauri;
+            if (!core) {
+                $scope.aiTestResult = 'Tauri not available';
+                $scope.aiTestSuccess = false;
+                return;
+            }
+
+            // 如果有新输入的 API Key，先保存
+            if ($scope.aiSettings.apiKey) {
+                $scope.aiTesting = true;
+                $scope.aiTestResult = '';
+                
+                core.invoke('save_ai_config', {
+                    provider: $scope.aiSettings.provider,
+                    apiKey: $scope.aiSettings.apiKey,
+                    apiUrl: $scope.aiSettings.apiUrl || '',
+                    model: $scope.aiSettings.model || ''
+                }).then(function() {
+                    return core.invoke('test_ai_config', {});
+                }).then(function(result) {
+                    $scope.aiTestResult = '✓ ' + result;
+                    $scope.aiTestSuccess = true;
+                    $scope.aiSettings.hasApiKey = true;
+                    $scope.aiSettings.testPassed = true;
+                    $scope.$apply();
+                }).catch(function(err) {
+                    $scope.aiTestResult = '✗ ' + err;
+                    $scope.aiTestSuccess = false;
+                    $scope.aiSettings.testPassed = false;
+                    $scope.$apply();
+                }).finally(function() {
+                    $scope.aiTesting = false;
+                    $scope.$apply();
+                });
+            } else if ($scope.aiSettings.hasApiKey) {
+                // 使用已存储的 Key 测试
+                $scope.aiTesting = true;
+                $scope.aiTestResult = '';
+                
+                core.invoke('test_ai_config', {}).then(function(result) {
+                    $scope.aiTestResult = '✓ ' + result;
+                    $scope.aiTestSuccess = true;
+                    $scope.aiSettings.testPassed = true;
+                    $scope.$apply();
+                }).catch(function(err) {
+                    $scope.aiTestResult = '✗ ' + err;
+                    $scope.aiTestSuccess = false;
+                    $scope.aiSettings.testPassed = false;
+                    $scope.$apply();
+                }).finally(function() {
+                    $scope.aiTesting = false;
+                    $scope.$apply();
+                });
+            } else {
+                $scope.aiTestResult = '请先输入 API Key';
+                $scope.aiTestSuccess = false;
+            }
         };
 
         // 计算悬停时的深色
@@ -149,6 +259,8 @@ angular.module('kityminderEditor')
 
         // 保存设置
         $scope.save = function () {
+            var tauri = window.__TAURI__ || {};
+            var core = tauri.core || tauri.tauri;
             var needRestart = false;
             
             // 检查语言是否改变
@@ -170,6 +282,19 @@ angular.module('kityminderEditor')
             
             // 保存到持久化存储
             config.save();
+            
+            // 保存 AI 设置
+            if (core && ($scope.aiSettings.apiKey || $scope.aiSettings.provider !== aiConfig.provider || 
+                $scope.aiSettings.apiUrl !== aiConfig.apiUrl || $scope.aiSettings.model !== aiConfig.model)) {
+                core.invoke('save_ai_config', {
+                    provider: $scope.aiSettings.provider,
+                    apiKey: $scope.aiSettings.apiKey || '',
+                    apiUrl: $scope.aiSettings.apiUrl || '',
+                    model: $scope.aiSettings.model || ''
+                }).catch(function(err) {
+                    console.error('Failed to save AI config:', err);
+                });
+            }
             
             $uibModalInstance.close({
                 needRestart: needRestart,

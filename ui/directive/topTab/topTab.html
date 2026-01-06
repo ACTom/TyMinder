@@ -42,4 +42,7 @@
         <select-all minder="minder"></select-all>
         <search-btn minder="minder"></search-btn>
     </uib-tab>
+    <uib-tab active="tabStatus.ai" heading="{{ 'ai' | lang: 'ui/tabs'; }}" ng-click="toggleTopTab('ai')" select="setCurTab('ai')">
+        <ai-tab minder="minder"></ai-tab>
+    </uib-tab>
 </uib-tabset>

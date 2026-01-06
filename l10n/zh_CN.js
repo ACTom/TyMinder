@@ -82,7 +82,8 @@ define(function(require, exports, module) {
                 'about': '关于',
                 'recentfiles': '最近打开',
                 'clearhistory': '清空历史',
-                'norecentfiles': '暂无最近打开的文件'
+                'norecentfiles': '暂无最近打开的文件',
+                'aigenerate': 'AI 生成导图'
             },
             'about': {
                 'version': '版本',
@@ -119,7 +120,8 @@ define(function(require, exports, module) {
                 'idea': '思路',
                 'appearence': '外观',
                 'view': '视图',
-                'settings': '设置'
+                'settings': '设置',
+                'ai': 'AI'
             },
             'language': '语言',
             'systemlanguage': '系统语言',
@@ -231,6 +233,8 @@ define(function(require, exports, module) {
                 },
                 'settings': {
                     'title': '设置',
+                    'general': '常规',
+                    'ai': 'AI',
                     'themecolor': '主题色',
                     'autobackup': '自动备份',
                     'enableautobackup': '启用自动备份',
@@ -240,6 +244,21 @@ define(function(require, exports, module) {
                     'deletebackuponsave': '保存时删除备份文件',
                     'backupsize': '备份占用空间',
                     'clicktoopenbackupdir': '点击打开备份文件夹',
+                    'aiprovider': 'AI 提供商',
+                    'testapikey': '测试连接',
+                    'testing': '测试中...',
+                    'aitestpassed': 'AI 配置已验证，可以正常使用',
+                    'airequiretest': '请点击“测试连接”验证配置',
+                    'ainotconfigured': '请输入 API Key 并测试连接',
+                    'customsettings': '自定义设置',
+                    'apiurl': 'API 地址',
+                    'modelname': '模型名称',
+                    'aifeatures': 'AI 功能说明',
+                    'aifeature_expand': '智能扩展 - 自动生成子节点',
+                    'aifeature_rewrite': '智能改写 - 扩展/精简/润色',
+                    'aifeature_summarize': '智能总结 - 汇总子节点内容',
+                    'aifeature_generate': '生成导图 - 根据主题生成完整导图',
+                    'aifeature_chat': 'AI 问答 - 基于导图内容对话',
                     'ok': '确定',
                     'cancel': '取消'
                 },
@@ -257,6 +276,37 @@ define(function(require, exports, module) {
                     'includeLink': '包含链接',
                     'cancel': '取消',
                     'export': '导出'
+                },
+                'aigenerate': {
+                    'title': 'AI 生成导图',
+                    'inputlabel': '请输入主题或大纲',
+                    'placeholder': '例如：\n- 输入一个主题："人工智能的应用领域"\n- 输入一个大纲："一、介绍\n二、方法\n三、实现\n四、总结"',
+                    'hint': 'AI 将根据您的输入自动生成思维导图结构',
+                    'generate': '生成',
+                    'generating': '生成中...',
+                    'cancel': '取消'
+                },
+                'aiexport': {
+                    'title': 'AI 智能导出',
+                    'selectformat': '选择导出格式',
+                    'article': '文章',
+                    'report': '报告',
+                    'outline': 'PPT 大纲',
+                    'articledesc': '将思维导图转换为一篇流畅的文章，适合写作和发布',
+                    'reportdesc': '将思维导图转换为一份正式的报告，包含标题、摘要和各章节',
+                    'outlinedesc': '将思维导图整理为 PPT 大纲格式，每页幻灯片分别标注',
+                    'generate': '生成',
+                    'generating': '生成中...',
+                    'back': '返回',
+                    'copy': '复制',
+                    'save': '保存',
+                    'cancel': '取消',
+                    'close': '关闭',
+                    'copied': '已复制到剪贴板',
+                    'saved': '保存成功',
+                    'savefailed': '保存失败',
+                    'exportfailed': '导出失败',
+                    'emptymaphint': '思维导图为空，请先添加内容'
                 }
             },
             'error': {
@@ -270,7 +320,47 @@ define(function(require, exports, module) {
                 'cut': '剪切',
                 'paste': '粘贴',
                 'clearpriority': '清除优先级',
-                'clearprogress': '清除进度'
+                'clearprogress': '清除进度',
+                'ai': 'AI',
+                'aiexpand': 'AI 扩展',
+                'aiexpandfor': '根据节点',
+                'aiexpandgenerate': '自动生成子节点',
+                'aiexpandfailed': 'AI 扩展失败',
+                'expandlevels': '扩展层级数',
+                'layer': '层',
+                'contentrichness': '内容丰富度',
+                'richnessconcise': '精简',
+                'richnessnormal': '正常',
+                'richnessdetailed': '详细',
+                'includemapcontext': '提供完整思维导图作为上下文（推荐，避免生成无关内容）',
+                'airewrite': 'AI 改写',
+                'aisummarize': 'AI 总结',
+                'aiexpandtip': '根据当前节点生成子节点',
+                'airewriteexpand': '扩展',
+                'airewritesimplify': '精简',
+                'airewritepolish': '润色',
+                'aisummarizetip': '总结所有子节点内容',
+                'aigenerating': 'AI 生成中...',
+                'pleaseconfigureaifirst': '请先在设置中配置 AI 并测试通过'
+            },
+            'aitab': {
+                'aigenerate': '生成导图',
+                'aichat': 'AI 问答',
+                'aiexportarticle': '导出文章',
+                'aiexportreport': '导出报告',
+                'aiexportppt': '导出 PPT',
+                'notconfigured': '请先在设置中配置 AI',
+                'pleaseconfigureaifirst': '请先在设置中配置 AI API Key',
+                'featurecoming': '此功能即将上线'
+            },
+            'aichat': {
+                'title': 'AI 问答',
+                'welcome': '你好！我是 AI 助手，可以基于当前思维导图的内容回答你的问题。请随时提问！',
+                'inputhint': '输入问题，按 Enter 发送...',
+                'clear': '清空聊天记录',
+                'notconfigured': '请先在设置中配置 AI',
+                'pleaseconfigureaifirst': '请先在设置中配置 AI API Key',
+                'aierror': 'AI 响应失败'
             }
         },
         'runtime': {

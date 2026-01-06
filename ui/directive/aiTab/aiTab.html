@@ -1,0 +1,54 @@
+<div class="ai-tab-container">
+    <!-- AI 生成导图 -->
+    <div class="km-btn-group ai-generate-group">
+        <div class="km-btn-item ai-generate"
+             ng-class="{'disabled': !aiConfigured}"
+             ng-click="showAIGenerate()"
+             title="{{ 'aigenerate' | lang:'ui/aitab' }}">
+            <i class="km-btn-icon"></i>
+            <span class="km-btn-caption">{{ 'aigenerate' | lang:'ui/aitab' }}</span>
+        </div>
+    </div>
+
+    <!-- AI 问答 -->
+    <div class="km-btn-group ai-chat-group">
+        <div class="km-btn-item ai-chat"
+             ng-class="{'disabled': !aiConfigured}"
+             ng-click="showAIChat()"
+             title="{{ 'aichat' | lang:'ui/aitab' }}">
+            <i class="km-btn-icon"></i>
+            <span class="km-btn-caption">{{ 'aichat' | lang:'ui/aitab' }}</span>
+        </div>
+    </div>
+
+    <!-- AI 导出 -->
+    <div class="km-btn-group ai-export-group">
+        <div class="km-btn-item ai-export-article"
+             ng-class="{'disabled': !aiConfigured}"
+             ng-click="showAIExportArticle()"
+             title="{{ 'aiexportarticle' | lang:'ui/aitab' }}">
+            <i class="km-btn-icon"></i>
+            <span class="km-btn-caption">{{ 'aiexportarticle' | lang:'ui/aitab' }}</span>
+        </div>
+        <div class="km-btn-item ai-export-report"
+             ng-class="{'disabled': !aiConfigured}"
+             ng-click="showAIExportReport()"
+             title="{{ 'aiexportreport' | lang:'ui/aitab' }}">
+            <i class="km-btn-icon"></i>
+            <span class="km-btn-caption">{{ 'aiexportreport' | lang:'ui/aitab' }}</span>
+        </div>
+        <div class="km-btn-item ai-export-ppt"
+             ng-class="{'disabled': !aiConfigured}"
+             ng-click="showAIExportPPT()"
+             title="{{ 'aiexportppt' | lang:'ui/aitab' }}">
+            <i class="km-btn-icon"></i>
+            <span class="km-btn-caption">{{ 'aiexportppt' | lang:'ui/aitab' }}</span>
+        </div>
+    </div>
+
+    <!-- 未配置提示 -->
+    <div class="ai-config-hint" ng-show="!aiConfigured">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        <span>{{ 'notconfigured' | lang:'ui/aitab' }}</span>
+    </div>
+</div>

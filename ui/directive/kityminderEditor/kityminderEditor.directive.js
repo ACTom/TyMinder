@@ -57,15 +57,17 @@ angular.module('kityminderEditor')
 						return ProtocolManager.decode(protocolName, data);
 					}).then(function(json) {
 						minder.importJson(json);
-						$timeout(function() {
-							// 只有 .km 格式才设置文档路径
-							if (setPath && protocolName === 'json') {
-								documentService.setFilePath(filePath);
-							} else {
-								// 导入的文件不设置路径，作为新文档
-								documentService.reset();
-							}
-							documentService.setModified(false);
+						return new Promise(function(resolve) {
+							$timeout(function() {
+								if (setPath && protocolName === 'json') {
+									documentService.setFilePath(filePath);
+									documentService.setModified(false);
+								} else {
+									documentService.reset();
+									// 导入的文件不设置修改状态，由调用方决定
+								}
+								resolve();
+							});
 						});
 					});
 				}
@@ -75,16 +77,37 @@ angular.module('kityminderEditor')
 				 */
 				function handleOpenFilePath(editor) {
 					var filePath = window.__OPEN_FILE_PATH__;
+					var isTempFile = window.__IS_TEMP_FILE__;
+					
 					if (filePath && native.isTauri) {
 						// 清除标记，避免重复处理
 						window.__OPEN_FILE_PATH__ = null;
+						window.__IS_TEMP_FILE__ = null;
 						
-						console.log('[TyMinder] Opening file from command line:', filePath);
+						console.log('[TyMinder] Opening file from command line:', filePath, 'isTempFile:', isTempFile);
 						
-						openFile(editor, filePath, true).catch(function(e) {
-							console.error('[TyMinder] Failed to open file from command line:', e);
-							alert(scope.editor.lang.t('failedtoopenfile', 'ui/error') + ': ' + e.message);
-						});
+						if (isTempFile) {
+							// 临时文件：读取内容后不设置文件路径，然后删除临时文件
+							openFile(editor, filePath, false).then(function() {
+								// 确保不设置文件路径，保存时会弹出另存为对话框
+								documentService.reset();
+								documentService.setModified(true);
+								
+								// 删除临时文件
+								native.invoke('cleanup_temp_file', { file_path: filePath }).catch(function(e) {
+									console.warn('[TyMinder] Failed to cleanup temp file:', e);
+								});
+							}).catch(function(e) {
+								console.error('[TyMinder] Failed to open temp file:', e);
+								alert(scope.editor.lang.t('failedtoopenfile', 'ui/error') + ': ' + e.message);
+							});
+						} else {
+							// 普通文件：正常打开并设置文件路径
+							openFile(editor, filePath, true).catch(function(e) {
+								console.error('[TyMinder] Failed to open file from command line:', e);
+								alert(scope.editor.lang.t('failedtoopenfile', 'ui/error') + ': ' + e.message);
+							});
+						}
 					}
 				}
 

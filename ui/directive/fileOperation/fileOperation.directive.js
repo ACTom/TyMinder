@@ -71,7 +71,7 @@ angular.module('kityminderEditor')
                     var systemLangStr =  (window.editor && window.editor.lang) ? window.editor.lang.t('systemlanguage', 'ui') : 'System Language';
                     
                     // 从 Tauri 配置读取主题色
-                    var openSettingsDialog = function(themeColor, backupConfig) {
+                    var openSettingsDialog = function(themeColor, backupConfig, aiConfig) {
                         var settingsModal = $modal.open({
                             animation: true,
                             templateUrl: 'ui/dialog/settings/settings.tpl.html',
@@ -83,7 +83,8 @@ angular.module('kityminderEditor')
                                 systemLangStr: function() { return systemLangStr; },
                                 langList: function() { return langList; },
                                 currentThemeColor: function() { return themeColor; },
-                                backupConfig: function() { return backupConfig || {}; }
+                                backupConfig: function() { return backupConfig || {}; },
+                                aiConfig: function() { return aiConfig || {}; }
                             }
                         });
 
@@ -117,19 +118,21 @@ angular.module('kityminderEditor')
                             core.invoke('get_config', { key: 'themeColor' }),
                             core.invoke('get_config', { key: 'autoBackup' }),
                             core.invoke('get_config', { key: 'backupInterval' }),
-                            core.invoke('get_config', { key: 'deleteBackupOnSave' })
+                            core.invoke('get_config', { key: 'deleteBackupOnSave' }),
+                            core.invoke('get_ai_config', {})
                         ]).then(function(results) {
                             var backupConfig = {
                                 autoBackup: results[1] !== false,
                                 backupInterval: results[2] || 5,
                                 deleteBackupOnSave: results[3] !== false
                             };
-                            openSettingsDialog(results[0] || '#fc8383', backupConfig);
+                            var aiConfig = results[4] || { provider: 'openai', hasApiKey: false, apiUrl: '', model: '' };
+                            openSettingsDialog(results[0] || '#fc8383', backupConfig, aiConfig);
                         }).catch(function() {
-                            openSettingsDialog('#fc8383', {});
+                            openSettingsDialog('#fc8383', {}, { provider: 'openai', hasApiKey: false, apiUrl: '', model: '' });
                         });
                     } else {
-                        openSettingsDialog('#fc8383', {});
+                        openSettingsDialog('#fc8383', {}, { provider: 'openai', hasApiKey: false, apiUrl: '', model: '' });
                     }
                 };
 

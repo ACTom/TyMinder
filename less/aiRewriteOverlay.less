@@ -1,0 +1,57 @@
+/* AI 改写遮罩层样式 */
+.ai-rewrite-overlay-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-rewrite-overlay-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.ai-rewrite-overlay-dialog {
+    position: relative;
+    background: white;
+    padding: 30px 50px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 200px;
+}
+
+.ai-rewrite-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 15px;
+    border: 3px solid #eee;
+    border-top-color: var(--theme-color, #fc8383);
+    border-radius: 50%;
+    animation: ai-rewrite-spin 1s linear infinite;
+}
+
+@keyframes ai-rewrite-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ai-rewrite-text {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.ai-rewrite-cancel {
+    min-width: 80px;
+}

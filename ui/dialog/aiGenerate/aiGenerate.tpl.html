@@ -1,0 +1,53 @@
+<div class="modal-header ai-generate-header">
+    <h4 class="modal-title">{{ 'title' | lang: 'ui/dialog/aigenerate' }}</h4>
+</div>
+<div class="modal-body ai-generate-body">
+    <div class="form-group">
+        <label>{{ 'inputlabel' | lang: 'ui/dialog/aigenerate' }}</label>
+        <textarea 
+            class="form-control ai-generate-input" 
+            ng-model="topic" 
+            rows="5" 
+            placeholder="{{ 'placeholder' | lang: 'ui/dialog/aigenerate' }}"
+            ng-disabled="loading">
+        </textarea>
+    </div>
+    <div class="ai-generate-hint">
+        <i class="glyphicon glyphicon-info-sign"></i>
+        {{ 'hint' | lang: 'ui/dialog/aigenerate' }}
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="generate()" ng-disabled="loading || !topic.trim()">
+        <span ng-hide="loading">{{ 'generate' | lang: 'ui/dialog/aigenerate' }}</span>
+        <span ng-show="loading">{{ 'generating' | lang: 'ui/dialog/aigenerate' }}</span>
+    </button>
+    <button class="btn btn-default" ng-click="cancel()" ng-disabled="loading">{{ 'cancel' | lang: 'ui/dialog/aigenerate' }}</button>
+</div>
+
+<style>
+.ai-generate-header {
+    background-color: var(--theme-color, #fc8383);
+    color: white;
+    border-radius: 5px 5px 0 0;
+}
+
+.ai-generate-body {
+    padding: 20px;
+}
+
+.ai-generate-input {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.ai-generate-hint {
+    margin-top: 10px;
+    color: #888;
+    font-size: 13px;
+}
+
+.ai-generate-hint .glyphicon {
+    margin-right: 5px;
+}
+</style>

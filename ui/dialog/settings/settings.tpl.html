@@ -2,73 +2,178 @@
     <h3 class="modal-title">{{ 'title' | lang: 'ui/dialog/settings'}}</h3>
 </div>
 <div class="modal-body settings-modal-body">
-    <!-- 语言设置 -->
-    <div class="settings-section">
-        <h4 class="settings-section-title">{{ 'language' | lang: 'ui'}}</h4>
-        <div class="settings-section-content">
-            <div class="dropdown" uib-dropdown style="display: inline-block;">
-                <button class="btn btn-default dropdown-toggle" uib-dropdown-toggle>
-                    {{ getLangLabel(settings.lang) }}
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href ng-click="selectLang('system')">{{ 'systemlanguage' | lang: 'ui' }}</a></li>
-                    <li class="divider"></li>
-                    <li ng-repeat="lang in supportedLangs">
-                        <a href ng-click="selectLang(lang.key)">{{lang.label}}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <!-- 标签页导航 -->
+    <ul class="nav nav-tabs settings-tabs">
+        <li ng-class="{'active': activeTab === 'general'}">
+            <a href ng-click="setActiveTab('general')">{{ 'general' | lang: 'ui/dialog/settings'}}</a>
+        </li>
+        <li ng-class="{'active': activeTab === 'ai'}">
+            <a href ng-click="setActiveTab('ai')">{{ 'ai' | lang: 'ui/dialog/settings'}}</a>
+        </li>
+    </ul>
     
-    <!-- 主题色设置 -->
-    <div class="settings-section">
-        <h4 class="settings-section-title">{{ 'themecolor' | lang: 'ui/dialog/settings'}}</h4>
-        <div class="settings-section-content">
-            <div class="theme-color-grid">
-                <div class="theme-color-item" 
-                     ng-repeat="colorObj in themeColors" 
-                     ng-click="selectThemeColor(colorObj)"
-                     ng-class="{'selected': isColorSelected(colorObj)}"
-                     ng-style="{'background-color': colorObj.color}"
-                     title="{{colorObj.name}}">
-                    <span class="glyphicon glyphicon-ok" ng-show="isColorSelected(colorObj)"></span>
+    <!-- 标签页内容 -->
+    <div class="tab-content settings-tab-content">
+        <!-- 常规设置 -->
+        <div class="tab-pane" ng-class="{'active': activeTab === 'general'}">
+            <!-- 语言设置 -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">{{ 'language' | lang: 'ui'}}</h4>
+                <div class="settings-section-content">
+                    <div class="dropdown" uib-dropdown style="display: inline-block;">
+                        <button class="btn btn-default dropdown-toggle" uib-dropdown-toggle>
+                            {{ getLangLabel(settings.lang) }}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href ng-click="selectLang('system')">{{ 'systemlanguage' | lang: 'ui' }}</a></li>
+                            <li class="divider"></li>
+                            <li ng-repeat="lang in supportedLangs">
+                                <a href ng-click="selectLang(lang.key)">{{lang.label}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 主题色设置 -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">{{ 'themecolor' | lang: 'ui/dialog/settings'}}</h4>
+                <div class="settings-section-content">
+                    <div class="theme-color-grid">
+                        <div class="theme-color-item" 
+                             ng-repeat="colorObj in themeColors" 
+                             ng-click="selectThemeColor(colorObj)"
+                             ng-class="{'selected': isColorSelected(colorObj)}"
+                             ng-style="{'background-color': colorObj.color}"
+                             title="{{colorObj.name}}">
+                            <span class="glyphicon glyphicon-ok" ng-show="isColorSelected(colorObj)"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 自动备份设置 -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">{{ 'autobackup' | lang: 'ui/dialog/settings'}}</h4>
+                <div class="settings-section-content">
+                    <div class="settings-row">
+                        <label class="settings-checkbox">
+                            <input type="checkbox" ng-model="settings.autoBackup">
+                            <span>{{ 'enableautobackup' | lang: 'ui/dialog/settings'}}</span>
+                        </label>
+                    </div>
+                    <div class="settings-row" ng-show="settings.autoBackup">
+                        <label>{{ 'backupinterval' | lang: 'ui/dialog/settings'}}</label>
+                        <select ng-model="settings.backupInterval" class="form-control settings-select">
+                            <option value="1">1 {{ 'minute' | lang: 'ui/dialog/settings'}}</option>
+                            <option value="3">3 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
+                            <option value="5">5 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
+                            <option value="10">10 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
+                            <option value="15">15 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
+                            <option value="30">30 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
+                        </select>
+                    </div>
+                    <div class="settings-row" ng-show="settings.autoBackup">
+                        <label class="settings-checkbox">
+                            <input type="checkbox" ng-model="settings.deleteBackupOnSave">
+                            <span>{{ 'deletebackuponsave' | lang: 'ui/dialog/settings'}}</span>
+                        </label>
+                    </div>
+                    <div class="settings-row backup-info" ng-show="settings.autoBackup">
+                        <span>{{ 'backupsize' | lang: 'ui/dialog/settings'}}</span>
+                        <span class="backup-size-value" ng-click="openBackupDir()" title="{{ 'clicktoopenbackupdir' | lang: 'ui/dialog/settings'}}">{{ backupSizeDisplay }}</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- 自动备份设置 -->
-    <div class="settings-section">
-        <h4 class="settings-section-title">{{ 'autobackup' | lang: 'ui/dialog/settings'}}</h4>
-        <div class="settings-section-content">
-            <div class="settings-row">
-                <label class="settings-checkbox">
-                    <input type="checkbox" ng-model="settings.autoBackup">
-                    <span>{{ 'enableautobackup' | lang: 'ui/dialog/settings'}}</span>
-                </label>
+        
+        <!-- AI 设置 -->
+        <div class="tab-pane" ng-class="{'active': activeTab === 'ai'}">
+            <!-- AI 提供商 -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">{{ 'aiprovider' | lang: 'ui/dialog/settings'}}</h4>
+                <div class="settings-section-content">
+                    <div class="dropdown" uib-dropdown style="display: inline-block;">
+                        <button class="btn btn-default dropdown-toggle" uib-dropdown-toggle>
+                            {{ getProviderLabel(aiSettings.provider) }}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="p in aiProviders">
+                                <a href ng-click="selectProvider(p.key)">{{p.label}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="settings-row" ng-show="settings.autoBackup">
-                <label>{{ 'backupinterval' | lang: 'ui/dialog/settings'}}</label>
-                <select ng-model="settings.backupInterval" class="form-control settings-select">
-                    <option value="1">1 {{ 'minute' | lang: 'ui/dialog/settings'}}</option>
-                    <option value="3">3 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
-                    <option value="5">5 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
-                    <option value="10">10 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
-                    <option value="15">15 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
-                    <option value="30">30 {{ 'minutes' | lang: 'ui/dialog/settings'}}</option>
-                </select>
+            
+            <!-- API Key -->
+            <div class="settings-section">
+                <h4 class="settings-section-title">API Key</h4>
+                <div class="settings-section-content">
+                    <div class="settings-row">
+                        <input type="password" 
+                               class="form-control settings-input" 
+                               ng-model="aiSettings.apiKey" 
+                               placeholder="{{ aiSettings.hasApiKey ? '••••••••••••••••' : 'sk-...' }}">
+                        <button class="btn btn-sm btn-default" ng-click="testAiConfig()" ng-disabled="aiTesting">
+                            <span ng-hide="aiTesting">{{ 'testapikey' | lang: 'ui/dialog/settings'}}</span>
+                            <span ng-show="aiTesting">{{ 'testing' | lang: 'ui/dialog/settings'}}</span>
+                        </button>
+                    </div>
+                    <div class="settings-row ai-test-result" ng-show="aiTestResult">
+                        <span ng-class="{'text-success': aiTestSuccess, 'text-danger': !aiTestSuccess}">
+                            {{ aiTestResult }}
+                        </span>
+                    </div>
+                    <div class="settings-row ai-config-status">
+                        <span ng-if="aiSettings.testPassed" class="text-success">
+                            <i class="glyphicon glyphicon-ok-circle"></i> {{ 'aitestpassed' | lang: 'ui/dialog/settings'}}
+                        </span>
+                        <span ng-if="!aiSettings.testPassed && aiSettings.hasApiKey" class="text-warning">
+                            <i class="glyphicon glyphicon-exclamation-sign"></i> {{ 'airequiretest' | lang: 'ui/dialog/settings'}}
+                        </span>
+                        <span ng-if="!aiSettings.hasApiKey" class="text-muted">
+                            <i class="glyphicon glyphicon-info-sign"></i> {{ 'ainotconfigured' | lang: 'ui/dialog/settings'}}
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div class="settings-row" ng-show="settings.autoBackup">
-                <label class="settings-checkbox">
-                    <input type="checkbox" ng-model="settings.deleteBackupOnSave">
-                    <span>{{ 'deletebackuponsave' | lang: 'ui/dialog/settings'}}</span>
-                </label>
+            
+            <!-- 自定义设置（仅自定义提供商显示） -->
+            <div class="settings-section" ng-show="aiSettings.provider === 'custom'">
+                <h4 class="settings-section-title">{{ 'customsettings' | lang: 'ui/dialog/settings'}}</h4>
+                <div class="settings-section-content">
+                    <div class="settings-row">
+                        <label>{{ 'apiurl' | lang: 'ui/dialog/settings'}}</label>
+                        <input type="text" 
+                               class="form-control settings-input-full" 
+                               ng-model="aiSettings.apiUrl" 
+                               placeholder="https://api.example.com/v1/chat/completions">
+                    </div>
+                    <div class="settings-row">
+                        <label>{{ 'modelname' | lang: 'ui/dialog/settings'}}</label>
+                        <input type="text" 
+                               class="form-control settings-input-full" 
+                               ng-model="aiSettings.model" 
+                               placeholder="gpt-4o-mini">
+                    </div>
+                </div>
             </div>
-            <div class="settings-row backup-info" ng-show="settings.autoBackup">
-                <span>{{ 'backupsize' | lang: 'ui/dialog/settings'}}</span>
-                <span class="backup-size-value" ng-click="openBackupDir()" title="{{ 'clicktoopenbackupdir' | lang: 'ui/dialog/settings'}}">{{ backupSizeDisplay }}</span>
+            
+            <!-- AI 功能说明 -->
+            <div class="settings-section ai-features-info">
+                <h4 class="settings-section-title">{{ 'aifeatures' | lang: 'ui/dialog/settings'}}</h4>
+                <div class="settings-section-content">
+                    <ul class="ai-features-list">
+                        <li><i class="glyphicon glyphicon-plus"></i> {{ 'aifeature_expand' | lang: 'ui/dialog/settings'}}</li>
+                        <li><i class="glyphicon glyphicon-edit"></i> {{ 'aifeature_rewrite' | lang: 'ui/dialog/settings'}}</li>
+                        <li><i class="glyphicon glyphicon-list-alt"></i> {{ 'aifeature_summarize' | lang: 'ui/dialog/settings'}}</li>
+                        <li><i class="glyphicon glyphicon-tree-conifer"></i> {{ 'aifeature_generate' | lang: 'ui/dialog/settings'}}</li>
+                        <li><i class="glyphicon glyphicon-comment"></i> {{ 'aifeature_chat' | lang: 'ui/dialog/settings'}}</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -90,19 +195,60 @@
 }
 
 .settings-modal-body {
-    padding: 20px 30px;
+    padding: 15px 20px;
+    min-height: 400px;
+}
+
+.settings-tabs {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+.settings-tabs > li > a {
+    color: #666;
+    border: none;
+    padding: 8px 20px;
+    margin-right: 5px;
+    border-radius: 4px 4px 0 0;
+}
+
+.settings-tabs > li > a:hover {
+    background-color: #f5f5f5;
+    border: none;
+}
+
+.settings-tabs > li.active > a,
+.settings-tabs > li.active > a:hover,
+.settings-tabs > li.active > a:focus {
+    color: var(--theme-color, #fc8383);
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid var(--theme-color, #fc8383);
+    margin-bottom: -2px;
+}
+
+.settings-tab-content {
+    padding: 10px 5px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
 }
 
 .settings-section {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .settings-section-title {
     font-size: 14px;
     font-weight: 600;
     color: #555;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
     border-bottom: 1px solid #eee;
 }
 
@@ -111,7 +257,7 @@
 }
 
 .settings-row {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -136,6 +282,16 @@
     width: auto;
     min-width: 120px;
     display: inline-block;
+}
+
+.settings-input {
+    flex: 1;
+    max-width: 300px;
+}
+
+.settings-input-full {
+    flex: 1;
+    width: 100%;
 }
 
 .backup-info {
@@ -185,5 +341,35 @@
     color: white;
     font-size: 14px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* AI 设置样式 */
+.ai-test-result {
+    font-size: 13px;
+}
+
+.ai-features-info {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 15px;
+}
+
+.ai-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ai-features-list li {
+    padding: 5px 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.ai-features-list li .glyphicon {
+    margin-right: 8px;
+    color: var(--theme-color, #fc8383);
+    width: 16px;
 }
 </style>

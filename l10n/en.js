@@ -83,7 +83,8 @@ define(function(require, exports, module) {
                 'about': 'About',
                 'recentfiles': 'Recent Files',
                 'clearhistory': 'Clear History',
-                'norecentfiles': 'No recent files'
+                'norecentfiles': 'No recent files',
+                'aigenerate': 'AI Generate Map'
             },
             'about': {
                 'version': 'Version',
@@ -120,7 +121,8 @@ define(function(require, exports, module) {
                 'idea': 'Idea',
                 'appearence': 'Appearance',
                 'view': 'View',
-                'settings': 'Settings'
+                'settings': 'Settings',
+                'ai': 'AI'
             },
             'language': 'Language', 
             'systemlanguage': 'System Language',
@@ -232,6 +234,8 @@ define(function(require, exports, module) {
                 },
                 'settings': {
                     'title': 'Settings',
+                    'general': 'General',
+                    'ai': 'AI',
                     'themecolor': 'Theme Color',
                     'autobackup': 'Auto Backup',
                     'enableautobackup': 'Enable Auto Backup',
@@ -241,6 +245,21 @@ define(function(require, exports, module) {
                     'deletebackuponsave': 'Delete backup when saving',
                     'backupsize': 'Backup Size',
                     'clicktoopenbackupdir': 'Click to open backup folder',
+                    'aiprovider': 'AI Provider',
+                    'testapikey': 'Test Connection',
+                    'testing': 'Testing...',
+                    'aitestpassed': 'AI configuration verified, ready to use',
+                    'airequiretest': 'Please click "Test Connection" to verify',
+                    'ainotconfigured': 'Please enter API Key and test connection',
+                    'customsettings': 'Custom Settings',
+                    'apiurl': 'API URL',
+                    'modelname': 'Model Name',
+                    'aifeatures': 'AI Features',
+                    'aifeature_expand': 'Smart Expand - Auto-generate child nodes',
+                    'aifeature_rewrite': 'Smart Rewrite - Expand/Simplify/Polish',
+                    'aifeature_summarize': 'Smart Summarize - Summarize child nodes',
+                    'aifeature_generate': 'Generate Map - Create complete mind map',
+                    'aifeature_chat': 'AI Chat - Discuss based on map content',
                     'ok': 'OK',
                     'cancel': 'Cancel'
                 },
@@ -258,6 +277,37 @@ define(function(require, exports, module) {
                     'includeLink': 'Include links',
                     'cancel': 'Cancel',
                     'export': 'Export'
+                },
+                'aigenerate': {
+                    'title': 'AI Generate Mind Map',
+                    'inputlabel': 'Enter a topic or outline',
+                    'placeholder': 'For example:\n- A topic: "Applications of Artificial Intelligence"\n- An outline: "1. Introduction\n2. Methods\n3. Implementation\n4. Conclusion"',
+                    'hint': 'AI will automatically generate a mind map structure based on your input',
+                    'generate': 'Generate',
+                    'generating': 'Generating...',
+                    'cancel': 'Cancel'
+                },
+                'aiexport': {
+                    'title': 'AI Smart Export',
+                    'selectformat': 'Select export format',
+                    'article': 'Article',
+                    'report': 'Report',
+                    'outline': 'PPT Outline',
+                    'articledesc': 'Convert mind map to a smooth article, suitable for writing and publishing',
+                    'reportdesc': 'Convert mind map to a formal report with title, abstract and sections',
+                    'outlinedesc': 'Convert mind map to PPT outline format with slide markers',
+                    'generate': 'Generate',
+                    'generating': 'Generating...',
+                    'back': 'Back',
+                    'copy': 'Copy',
+                    'save': 'Save',
+                    'cancel': 'Cancel',
+                    'close': 'Close',
+                    'copied': 'Copied to clipboard',
+                    'saved': 'Saved successfully',
+                    'savefailed': 'Save failed',
+                    'exportfailed': 'Export failed',
+                    'emptymaphint': 'Mind map is empty, please add content first'
                 }
             },
             'error': {
@@ -271,7 +321,47 @@ define(function(require, exports, module) {
                 'cut': 'Cut',
                 'paste': 'Paste',
                 'clearpriority': 'Clear Priority',
-                'clearprogress': 'Clear Progress'
+                'clearprogress': 'Clear Progress',
+                'ai': 'AI',
+                'aiexpand': 'AI Expand',
+                'aiexpandfor': 'For node',
+                'aiexpandgenerate': 'auto generate child nodes',
+                'aiexpandfailed': 'AI Expand failed',
+                'expandlevels': 'Expand levels',
+                'layer': 'layer',
+                'contentrichness': 'Content richness',
+                'richnessconcise': 'Concise',
+                'richnessnormal': 'Normal',
+                'richnessdetailed': 'Detailed',
+                'includemapcontext': 'Provide full mind map as context (recommended, to avoid irrelevant content)',
+                'airewrite': 'AI Rewrite',
+                'aisummarize': 'AI Summarize',
+                'aiexpandtip': 'Generate child nodes from current node',
+                'airewriteexpand': 'Expand',
+                'airewritesimplify': 'Simplify',
+                'airewritepolish': 'Polish',
+                'aisummarizetip': 'Summarize all child nodes',
+                'aigenerating': 'AI Generating...',
+                'pleaseconfigureaifirst': 'Please configure AI in Settings and pass the test first'
+            },
+            'aitab': {
+                'aigenerate': 'Generate Map',
+                'aichat': 'AI Chat',
+                'aiexportarticle': 'Export Article',
+                'aiexportreport': 'Export Report',
+                'aiexportppt': 'Export PPT',
+                'notconfigured': 'Please configure AI in Settings',
+                'pleaseconfigureaifirst': 'Please configure AI API Key in Settings first',
+                'featurecoming': 'This feature is coming soon'
+            },
+            'aichat': {
+                'title': 'AI Chat',
+                'welcome': 'Hello! I am an AI assistant and can answer your questions based on the current mind map content. Feel free to ask!',
+                'inputhint': 'Enter your question, press Enter to send...',
+                'clear': 'Clear chat history',
+                'notconfigured': 'Please configure AI in Settings',
+                'pleaseconfigureaifirst': 'Please configure AI API Key in Settings first',
+                'aierror': 'AI response failed'
             }
         },
         'runtime': {

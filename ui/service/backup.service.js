@@ -176,8 +176,6 @@ angular.module('kityminderEditor')
                 this._timer = setInterval(function() {
                     self.doBackup();
                 }, intervalMs);
-                
-                console.log('[Backup] Timer started, interval:', interval, 'minutes');
             },
             
             /**
@@ -187,7 +185,6 @@ angular.module('kityminderEditor')
                 if (this._timer) {
                     clearInterval(this._timer);
                     this._timer = null;
-                    console.log('[Backup] Timer stopped');
                 }
             },
             

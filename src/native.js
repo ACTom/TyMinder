@@ -133,13 +133,9 @@ define(function(require, exports, module) {
              * @param {string} filePath 可选，要在新窗口中打开的文件路径
              */
             createWindow: function(filePath) {
-                console.log('[TyMinder] createWindow called with filePath:', filePath);
-                return native.invoke('new_window', { file_path: filePath || null })
-                    .then(function() {
-                        console.log('[TyMinder] Window created successfully');
-                    })
+                return native.invoke('new_window', { filePath: filePath || null })
                     .catch(function(e) {
-                        console.error('[TyMinder] Failed to create window:', e);
+                        console.error('Failed to create window:', e);
                         throw e;
                     });
             },

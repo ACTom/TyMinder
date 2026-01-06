@@ -3,7 +3,10 @@
     <div search-box minder="minder" ng-if="minder"></div>
 	<div class="minder-editor"></div>
     <div class="km-note" note-editor minder="minder" ng-if="minder"></div>
+    <div class="ai-chat-panel-container" ai-chat-panel minder="minder" ng-if="minder"></div>
     <div class="note-previewer" note-previewer ng-if="minder"></div>
     <div class="navigator" navigator minder="minder" ng-if="minder"></div>
     <context-menu minder="minder" ng-if="minder"></context-menu>
+    <!-- AI 改写遮罩层 -->
+    <div class="ai-rewrite-overlay" ai-rewrite-overlay ng-if="minder"></div>
 </div>

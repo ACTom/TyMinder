@@ -54,7 +54,8 @@ angular.module('kityminderEditor')
                     file: false,
                     idea: true,
                     appearance: false,
-                    view: false
+                    view: false,
+                    ai: false
                 };
 
                 scope.goBackToIdea = function () {
@@ -213,8 +214,6 @@ angular.module('kityminderEditor')
                             // 用户取消，不关闭窗口
                         });
                     });
-                    
-                    console.log('[TyMinder] Window close handler registered');
                 }
                 
                 // 设置窗口关闭处理器

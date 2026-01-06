@@ -2,6 +2,11 @@
 use tauri::Manager;
 use serde_json::{Value, json};
 use serde::{Deserialize, Serialize};
+use aes_gcm::{
+    aead::{Aead, KeyInit},
+    Aes256Gcm, Nonce,
+};
+use rand::Rng;
 
 /// 窗口状态配置
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -324,6 +329,324 @@ fn delete_file_backups(app: tauri::AppHandle, file_name: String) -> Result<u32, 
     Ok(deleted_count)
 }
 
+// ==================== AI 功能相关 ====================
+
+/// AI 配置结构
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+struct AiConfig {
+    provider: String,           // openai, claude, qwen, deepseek, custom
+    api_key_encrypted: String,  // 加密存储的 API Key
+    api_url: String,            // API 地址（自定义时使用）
+    model: String,              // 模型名称
+    test_passed: bool,          // 测试是否通过
+}
+
+/// 获取或创建加密密钥（固定存储在配置目录）
+fn get_or_create_encryption_key(app: &tauri::AppHandle) -> Result<[u8; 32], String> {
+    let config_dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
+    let key_path = config_dir.join(".ai_key");
+    
+    if key_path.exists() {
+        let key_hex = std::fs::read_to_string(&key_path).map_err(|e| e.to_string())?;
+        let key_bytes = hex::decode(key_hex.trim()).map_err(|e| e.to_string())?;
+        if key_bytes.len() == 32 {
+            let mut key = [0u8; 32];
+            key.copy_from_slice(&key_bytes);
+            return Ok(key);
+        }
+    }
+    
+    // 生成新密钥
+    let mut key = [0u8; 32];
+    rand::thread_rng().fill(&mut key);
+    
+    // 保存密钥
+    if !config_dir.exists() {
+        std::fs::create_dir_all(&config_dir).map_err(|e| e.to_string())?;
+    }
+    std::fs::write(&key_path, hex::encode(key)).map_err(|e| e.to_string())?;
+    
+    Ok(key)
+}
+
+/// 加密数据
+fn encrypt_data(key: &[u8; 32], plaintext: &str) -> Result<String, String> {
+    let cipher = Aes256Gcm::new_from_slice(key).map_err(|e| e.to_string())?;
+    
+    // 生成随机 nonce
+    let mut nonce_bytes = [0u8; 12];
+    rand::thread_rng().fill(&mut nonce_bytes);
+    let nonce = Nonce::from_slice(&nonce_bytes);
+    
+    let ciphertext = cipher
+        .encrypt(nonce, plaintext.as_bytes())
+        .map_err(|e| e.to_string())?;
+    
+    // 返回 nonce + ciphertext 的 hex 编码
+    let mut result = nonce_bytes.to_vec();
+    result.extend(ciphertext);
+    Ok(hex::encode(result))
+}
+
+/// 解密数据
+fn decrypt_data(key: &[u8; 32], encrypted: &str) -> Result<String, String> {
+    if encrypted.is_empty() {
+        return Ok(String::new());
+    }
+    
+    let data = hex::decode(encrypted).map_err(|e| e.to_string())?;
+    if data.len() < 12 {
+        return Err("Invalid encrypted data".to_string());
+    }
+    
+    let (nonce_bytes, ciphertext) = data.split_at(12);
+    let nonce = Nonce::from_slice(nonce_bytes);
+    
+    let cipher = Aes256Gcm::new_from_slice(key).map_err(|e| e.to_string())?;
+    
+    let plaintext = cipher
+        .decrypt(nonce, ciphertext)
+        .map_err(|_| "Decryption failed".to_string())?;
+    
+    String::from_utf8(plaintext).map_err(|e| e.to_string())
+}
+
+/// 保存 AI 配置
+#[tauri::command]
+fn save_ai_config(
+    app: tauri::AppHandle,
+    provider: String,
+    api_key: String,
+    api_url: String,
+    model: String,
+) -> Result<(), String> {
+    let key = get_or_create_encryption_key(&app)?;
+    
+    // 加密 API Key
+    let api_key_encrypted = if api_key.is_empty() {
+        // 如果没有新的 API Key，保留旧的
+        let old_config = get_ai_config_internal(&app).ok();
+        old_config.map(|c| c.api_key_encrypted).unwrap_or_default()
+    } else {
+        encrypt_data(&key, &api_key)?
+    };
+    
+    // 新配置需要重新测试
+    let config = AiConfig {
+        provider,
+        api_key_encrypted,
+        api_url,
+        model,
+        test_passed: false,  // 重置测试状态
+    };
+    
+    let config_dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
+    if !config_dir.exists() {
+        std::fs::create_dir_all(&config_dir).map_err(|e| e.to_string())?;
+    }
+    
+    let ai_config_path = config_dir.join("ai_config.json");
+    let content = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
+    std::fs::write(ai_config_path, content).map_err(|e| e.to_string())?;
+    
+    Ok(())
+}
+
+/// 获取 AI 配置（返回时 API Key 显示为脱敏形式）
+#[tauri::command]
+fn get_ai_config(app: tauri::AppHandle) -> Result<Value, String> {
+    let config_path = app.path().app_config_dir()
+        .map_err(|e| e.to_string())?
+        .join("ai_config.json");
+    
+    if !config_path.exists() {
+        return Ok(json!({
+            "provider": "openai",
+            "hasApiKey": false,
+            "testPassed": false,
+            "apiUrl": "",
+            "model": ""
+        }));
+    }
+    
+    let content = std::fs::read_to_string(&config_path).map_err(|e| e.to_string())?;
+    let config: AiConfig = serde_json::from_str(&content).unwrap_or_default();
+    
+    Ok(json!({
+        "provider": config.provider,
+        "hasApiKey": !config.api_key_encrypted.is_empty(),
+        "testPassed": config.test_passed,
+        "apiUrl": config.api_url,
+        "model": config.model
+    }))
+}
+
+/// 获取实际的 API Key（解密，仅内部使用）
+fn get_decrypted_api_key(app: &tauri::AppHandle) -> Result<String, String> {
+    let config_path = app.path().app_config_dir()
+        .map_err(|e| e.to_string())?
+        .join("ai_config.json");
+    
+    if !config_path.exists() {
+        return Err("AI config not found".to_string());
+    }
+    
+    let content = std::fs::read_to_string(&config_path).map_err(|e| e.to_string())?;
+    let config: AiConfig = serde_json::from_str(&content).map_err(|e| e.to_string())?;
+    
+    if config.api_key_encrypted.is_empty() {
+        return Err("API Key not configured".to_string());
+    }
+    
+    let key = get_or_create_encryption_key(app)?;
+    decrypt_data(&key, &config.api_key_encrypted)
+}
+
+/// 获取 AI 配置详情（内部使用）
+fn get_ai_config_internal(app: &tauri::AppHandle) -> Result<AiConfig, String> {
+    let config_path = app.path().app_config_dir()
+        .map_err(|e| e.to_string())?
+        .join("ai_config.json");
+    
+    if !config_path.exists() {
+        return Err("AI config not found".to_string());
+    }
+    
+    let content = std::fs::read_to_string(&config_path).map_err(|e| e.to_string())?;
+    serde_json::from_str(&content).map_err(|e| e.to_string())
+}
+
+/// 根据提供商获取 API URL
+fn get_api_url(config: &AiConfig) -> String {
+    if !config.api_url.is_empty() {
+        return config.api_url.clone();
+    }
+    
+    match config.provider.as_str() {
+        "openai" => "https://api.openai.com/v1/chat/completions".to_string(),
+        "claude" => "https://api.anthropic.com/v1/messages".to_string(),
+        "qwen" => "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions".to_string(),
+        "deepseek" => "https://api.deepseek.com/v1/chat/completions".to_string(),
+        _ => config.api_url.clone(),
+    }
+}
+
+/// 根据提供商获取默认模型
+fn get_default_model(provider: &str) -> String {
+    match provider {
+        "openai" => "gpt-4o-mini".to_string(),
+        "claude" => "claude-3-5-sonnet-20241022".to_string(),
+        "qwen" => "qwen-plus".to_string(),
+        "deepseek" => "deepseek-chat".to_string(),
+        _ => String::new(),
+    }
+}
+
+/// AI 聊天请求
+#[tauri::command]
+async fn ai_chat(
+    app: tauri::AppHandle,
+    messages: Vec<Value>,
+    system_prompt: Option<String>,
+) -> Result<String, String> {
+    let config = get_ai_config_internal(&app)?;
+    let api_key = get_decrypted_api_key(&app)?;
+    let api_url = get_api_url(&config);
+    let model = if config.model.is_empty() {
+        get_default_model(&config.provider)
+    } else {
+        config.model.clone()
+    };
+    
+    let client = reqwest::Client::new();
+    
+    // 构建请求体
+    let request_body = if config.provider == "claude" {
+        // Claude 使用不同的 API 格式
+        json!({
+            "model": model,
+            "max_tokens": 4096,
+            "system": system_prompt.unwrap_or_default(),
+            "messages": messages
+        })
+    } else {
+        // OpenAI 兼容格式
+        let mut msgs = Vec::new();
+        if let Some(sys) = system_prompt {
+            msgs.push(json!({"role": "system", "content": sys}));
+        }
+        msgs.extend(messages);
+        json!({
+            "model": model,
+            "messages": msgs
+        })
+    };
+    
+    // 构建请求
+    let mut request = client.post(&api_url)
+        .header("Content-Type", "application/json");
+    
+    if config.provider == "claude" {
+        request = request
+            .header("x-api-key", &api_key)
+            .header("anthropic-version", "2023-06-01");
+    } else {
+        request = request.header("Authorization", format!("Bearer {}", api_key));
+    }
+    
+    let response = request
+        .json(&request_body)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    if !response.status().is_success() {
+        let status = response.status();
+        let error_text = response.text().await.unwrap_or_default();
+        return Err(format!("API error {}: {}", status, error_text));
+    }
+    
+    let response_json: Value = response.json().await.map_err(|e| e.to_string())?;
+    
+    // 解析响应
+    let content = if config.provider == "claude" {
+        response_json["content"][0]["text"]
+            .as_str()
+            .unwrap_or("")
+            .to_string()
+    } else {
+        response_json["choices"][0]["message"]["content"]
+            .as_str()
+            .unwrap_or("")
+            .to_string()
+    };
+    
+    Ok(content)
+}
+
+/// 测试 AI 配置是否有效
+#[tauri::command]
+async fn test_ai_config(app: tauri::AppHandle) -> Result<String, String> {
+    let messages = vec![json!({"role": "user", "content": "Say 'Hello' in one word."})];
+    let result = ai_chat(app.clone(), messages, None).await?;
+    
+    // 测试成功，更新 test_passed 状态
+    let config_path = app.path().app_config_dir()
+        .map_err(|e| e.to_string())?
+        .join("ai_config.json");
+    
+    if config_path.exists() {
+        let content = std::fs::read_to_string(&config_path).map_err(|e| e.to_string())?;
+        if let Ok(mut config) = serde_json::from_str::<AiConfig>(&content) {
+            config.test_passed = true;
+            let new_content = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
+            std::fs::write(&config_path, new_content).map_err(|e| e.to_string())?;
+        }
+    }
+    
+    Ok(result)
+}
+
 /// 生成唯一的窗口标签
 fn generate_window_label() -> String {
     format!("tyminder-{}", std::time::SystemTime::now()
@@ -334,7 +657,8 @@ fn generate_window_label() -> String {
 
 /// 创建新窗口 - 所有窗口都是同级的，没有主窗口之分
 /// file_path: 可选的文件路径，如果指定则在窗口初始化后打开该文件
-fn create_window(app: &tauri::AppHandle, file_path: Option<&str>) -> tauri::Result<()> {
+/// is_temp: 是否是临时文件，如果是则打开后不设置文件路径，保存时弹出另存为对话框
+fn create_window(app: &tauri::AppHandle, file_path: Option<&str>, is_temp: bool) -> tauri::Result<()> {
     let label = generate_window_label();
     
     // 读取保存的窗口状态
@@ -353,12 +677,12 @@ fn create_window(app: &tauri::AppHandle, file_path: Option<&str>) -> tauri::Resu
         
     // 注入系统语言、配置和待打开的文件路径
     let file_path_js = match file_path {
-        Some(path) => format!("\"{}\"" , path.replace("\\", "\\\\").replace("\"", "\\\"")),
+        Some(path) => format!("\"{}\"", path.replace("\\", "\\\\").replace("\"", "\\\"")),
         None => "null".to_string()
     };
     let init_script = format!(
-        "window.__SYSTEM_LOCALE__ = \"{}\"; window.__OPEN_FILE_PATH__ = {}; window.__APP_CONFIG__ = {{ lang: \"{}\", themeColor: \"{}\", autoBackup: {}, backupInterval: {}, deleteBackupOnSave: {} }};",
-        locale, file_path_js, lang, theme_color, auto_backup, backup_interval, delete_backup_on_save
+        "window.__SYSTEM_LOCALE__ = \"{}\"; window.__OPEN_FILE_PATH__ = {}; window.__IS_TEMP_FILE__ = {}; window.__APP_CONFIG__ = {{ lang: \"{}\", themeColor: \"{}\", autoBackup: {}, backupInterval: {}, deleteBackupOnSave: {} }};",
+        locale, file_path_js, is_temp, lang, theme_color, auto_backup, backup_interval, delete_backup_on_save
     );
 
     // 开发模式下使用 devUrl，生产模式使用 App URL
@@ -423,27 +747,51 @@ fn create_window(app: &tauri::AppHandle, file_path: Option<&str>) -> tauri::Resu
 }
 
 /// 新建窗口命令 - 通过启动新的应用程序实例来创建新窗口
-#[tauri::command]
-fn new_window(file_path: Option<String>) -> Result<(), String> {
-    println!("[TyMinder] new_window called with file_path: {:?}", file_path);
-    
-    // 获取当前可执行文件的路径
+#[tauri::command(rename_all = "camelCase")]
+fn new_window(file_path: Option<String>, is_temp: Option<bool>) -> Result<(), String> {
     let exe_path = std::env::current_exe().map_err(|e| e.to_string())?;
-    
     let mut cmd = std::process::Command::new(&exe_path);
     
-    // 如果有文件路径，作为参数传递
-    if let Some(path) = file_path {
-        cmd.arg(&path);
+    if let Some(ref path) = file_path {
+        cmd.arg(path);
+        if is_temp.unwrap_or(false) {
+            cmd.arg("--temp");
+        }
     }
     
-    // 启动新实例
-    cmd.spawn().map_err(|e| {
-        eprintln!("[TyMinder] Failed to spawn new instance: {}", e);
-        e.to_string()
-    })?;
+    cmd.spawn().map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+/// 保存临时文件并返回路径
+#[tauri::command]
+fn save_temp_file(app: tauri::AppHandle, contents: String, filename: String) -> Result<String, String> {
+    let temp_dir = app.path().temp_dir().unwrap_or_else(|_| std::env::temp_dir());
+    let tyminder_temp = temp_dir.join("TyMinder");
+    std::fs::create_dir_all(&tyminder_temp).map_err(|e| e.to_string())?;
     
-    println!("[TyMinder] New instance spawned successfully");
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|e| e.to_string())?
+        .as_millis();
+    let safe_filename = filename.replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], "_");
+    let file_path = tyminder_temp.join(format!("{}_{}.km", safe_filename, timestamp));
+    
+    std::fs::write(&file_path, &contents).map_err(|e| e.to_string())?;
+    Ok(file_path.to_string_lossy().to_string())
+}
+
+/// 清理临时文件
+#[tauri::command]
+fn cleanup_temp_file(file_path: String) -> Result<(), String> {
+    let path = std::path::Path::new(&file_path);
+    
+    // 安全检查：只删除 TyMinder 临时目录下的文件
+    let temp_dir = std::env::temp_dir().join("TyMinder");
+    if path.starts_with(&temp_dir) && path.exists() {
+        std::fs::remove_file(path).map_err(|e| e.to_string())?;
+    }
+    
     Ok(())
 }
 
@@ -451,25 +799,20 @@ fn new_window(file_path: Option<String>) -> Result<(), String> {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            // 解析命令行参数，获取要打开的文件路径
             let args: Vec<String> = std::env::args().collect();
-            let file_path = args.get(1).and_then(|path| {
-                // 过滤掉以 - 开头的参数（这些是 Tauri/系统参数）
-                if path.starts_with('-') {
-                    None
-                } else {
-                    Some(path.as_str())
-                }
-            });
+            let is_temp = args.iter().any(|arg| arg == "--temp");
+            let file_path = args.iter()
+                .skip(1)
+                .find(|arg| !arg.starts_with('-'))
+                .map(|s| s.as_str());
             
-            // 创建第一个窗口，如果有文件参数则打开该文件
-            create_window(app.handle(), file_path)?;
+            create_window(app.handle(), file_path, is_temp)?;
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![greet, save_file, save_file_base64, read_file, read_file_binary, get_file_info, new_window, get_config, set_config, get_system_locale, get_backup_dir, get_backup_info, save_backup, delete_backup, delete_file_backups])
+        .invoke_handler(tauri::generate_handler![greet, save_file, save_file_base64, read_file, read_file_binary, get_file_info, new_window, save_temp_file, cleanup_temp_file, get_config, set_config, get_system_locale, get_backup_dir, get_backup_info, save_backup, delete_backup, delete_file_backups, save_ai_config, get_ai_config, ai_chat, test_ai_config])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

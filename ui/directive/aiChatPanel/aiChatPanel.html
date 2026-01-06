@@ -1,0 +1,66 @@
+<div class="ai-chat-panel panel panel-default" ng-show="panelOpen">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'title' | lang: 'ui/aichat' }}</h3>
+        <div class="panel-actions">
+            <i class="glyphicon glyphicon-trash clear-btn" ng-click="clearMessages()" title="{{ 'clear' | lang: 'ui/aichat' }}"></i>
+            <i class="glyphicon glyphicon-remove close-btn" ng-click="closePanel()"></i>
+        </div>
+    </div>
+    
+    <div class="panel-body">
+        <!-- 未配置提示 -->
+        <div class="ai-chat-not-configured" ng-show="!aiConfigured">
+            <span class="glyphicon glyphicon-info-sign"></span>
+            <p>{{ 'notconfigured' | lang: 'ui/aichat' }}</p>
+        </div>
+        
+        <!-- 消息列表 -->
+        <div class="ai-chat-messages" ng-show="aiConfigured">
+            <!-- 欢迎消息 -->
+            <div class="chat-message assistant" ng-show="messages.length === 0">
+                <div class="message-avatar">
+                    <span class="glyphicon glyphicon-flash"></span>
+                </div>
+                <div class="message-content">
+                    <p>{{ 'welcome' | lang: 'ui/aichat' }}</p>
+                </div>
+            </div>
+            
+            <!-- 聊天消息 -->
+            <div class="chat-message" ng-repeat="msg in messages" ng-class="msg.role">
+                <div class="message-avatar">
+                    <span class="glyphicon" ng-class="{'glyphicon-user': msg.role === 'user', 'glyphicon-flash': msg.role === 'assistant', 'glyphicon-warning-sign': msg.role === 'error'}"></span>
+                </div>
+                <div class="message-content">
+                    <!-- 用户消息使用 nl2br，AI 回复使用 markdown 渲染 -->
+                    <p ng-if="msg.role === 'user'" ng-bind-html="msg.content | nl2br"></p>
+                    <div ng-if="msg.role !== 'user'" class="markdown-body" ng-bind-html="msg.content | markdown"></div>
+                </div>
+            </div>
+            
+            <!-- 加载中 -->
+            <div class="chat-message assistant loading" ng-show="loading">
+                <div class="message-avatar">
+                    <span class="glyphicon glyphicon-flash"></span>
+                </div>
+                <div class="message-content">
+                    <span class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 输入区域 -->
+        <div class="ai-chat-input" ng-show="aiConfigured">
+            <textarea 
+                ng-model="userInput" 
+                ng-keypress="onKeypress($event)"
+                placeholder="{{ 'inputhint' | lang: 'ui/aichat' }}"
+                ng-disabled="loading"></textarea>
+            <button class="btn btn-primary send-btn" ng-click="sendMessage()" ng-disabled="loading || !userInput.trim()">
+                <span class="glyphicon glyphicon-send"></span>
+            </button>
+        </div>
+    </div>
+</div>
