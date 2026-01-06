@@ -114,7 +114,7 @@ git clone https://github.com/ACtom/TyMinder.git
 cd TyMinder
 
 # Install dependencies
-npm run install
+npm run init
 
 # Start Tauri dev mode
 npm run tauri dev

@@ -253,6 +253,14 @@ define(function(require, exports, module) {
                 'failedtoopenfile': 'Impossibile aprire il file',
                 'unsupportedformat': 'Formato file non supportato',
                 'protocolnotavailable': 'Gestore protocolli non disponibile'
+            },
+            'contextmenu': {
+                'insert': 'Inserisci',
+                'copy': 'Copia',
+                'cut': 'Taglia',
+                'paste': 'Incolla',
+                'clearpriority': 'Cancella priorità',
+                'clearprogress': 'Cancella progresso'
             }
         },
         'runtime': {

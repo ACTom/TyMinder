@@ -254,6 +254,14 @@ define(function(require, exports, module) {
                 'failedtoopenfile': 'Error al abrir el archivo',
                 'unsupportedformat': 'Formato de archivo no compatible',
                 'protocolnotavailable': 'Administrador de protocolos no disponible'
+            },
+            'contextmenu': {
+                'insert': 'Insertar',
+                'copy': 'Copiar',
+                'cut': 'Cortar',
+                'paste': 'Pegar',
+                'clearpriority': 'Borrar prioridad',
+                'clearprogress': 'Borrar progreso'
             }
         },
         'runtime': {

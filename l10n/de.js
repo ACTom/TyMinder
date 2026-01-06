@@ -254,6 +254,14 @@ define(function(require, exports, module) {
                 'failedtoopenfile': 'Datei konnte nicht geöffnet werden',
                 'unsupportedformat': 'Nicht unterstütztes Dateiformat',
                 'protocolnotavailable': 'Protokollmanager nicht verfügbar'
+            },
+            'contextmenu': {
+                'insert': 'Einfügen',
+                'copy': 'Kopieren',
+                'cut': 'Ausschneiden',
+                'paste': 'Einfügen',
+                'clearpriority': 'Priorität löschen',
+                'clearprogress': 'Fortschritt löschen'
             }
         },
         'runtime': {

@@ -254,6 +254,14 @@ define(function(require, exports, module) {
                 'failedtoopenfile': '開啟檔案失敗',
                 'unsupportedformat': '不支援的檔案格式',
                 'protocolnotavailable': '協定管理器不可用'
+            },
+            'contextmenu': {
+                'insert': '插入',
+                'copy': '複製',
+                'cut': '剪下',
+                'paste': '貼上',
+                'clearpriority': '清除優先權',
+                'clearprogress': '清除進度'
             }
         },
         'runtime': {
