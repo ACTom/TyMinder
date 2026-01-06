@@ -263,6 +263,14 @@ define(function(require, exports, module) {
                 'failedtoopenfile': '打开文件失败',
                 'unsupportedformat': '不支持的文件格式',
                 'protocolnotavailable': '协议管理器不可用'
+            },
+            'contextmenu': {
+                'insert': '插入',
+                'copy': '复制',
+                'cut': '剪切',
+                'paste': '粘贴',
+                'clearpriority': '清除优先级',
+                'clearprogress': '清除进度'
             }
         },
         'runtime': {

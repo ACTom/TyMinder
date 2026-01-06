@@ -1,5 +1,5 @@
 angular.module('kityminderEditor')
-    .controller('exportMarkdown.ctrl', ['$scope', '$modalInstance', 'minder', 'exportCallback', function ($scope, $modalInstance, minder, exportCallback) {
+    .controller('exportMarkdown.ctrl', ['$scope', '$uibModalInstance', 'minder', 'exportCallback', function ($scope, $uibModalInstance, minder, exportCallback) {
         
         // 默认选项
         $scope.options = {
@@ -11,7 +11,7 @@ angular.module('kityminderEditor')
 
         // 取消
         $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
 
         // 导出
@@ -23,7 +23,7 @@ angular.module('kityminderEditor')
                 includeLink: $scope.options.includeLink
             };
             
-            $modalInstance.close(options);
+            $uibModalInstance.close(options);
             
             // 执行导出回调
             if (exportCallback) {

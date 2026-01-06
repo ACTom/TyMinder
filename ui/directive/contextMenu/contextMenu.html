@@ -1,0 +1,73 @@
+<div class="km-context-menu" ng-show="visible" ng-style="{'left': menuX + 'px', 'top': menuY + 'px'}">
+    <ul class="menu-list">
+        <li ng-repeat="item in menuItems track by $index"
+            ng-class="{
+                'separator': item.type === 'separator',
+                'has-submenu': item.submenu,
+                'active': activeSubmenu === item.id,
+                'disabled': isDisabled(item)
+            }"
+            ng-mouseenter="onItemEnter(item, $event)"
+            ng-click="onItemClick(item, $event)">
+            
+            <!-- 分隔线 -->
+            <div ng-if="item.type === 'separator'" class="separator-line"></div>
+            
+            <!-- 普通菜单项 -->
+            <div ng-if="item.type !== 'separator'" class="menu-item-content">
+                <span class="menu-icon">
+                    <i ng-if="item.icon && item.icon.indexOf('glyphicon') === 0" class="glyphicon {{item.icon}}"></i>
+                    <span ng-if="item.icon && item.icon.indexOf('priority-') === 0" class="{{item.icon}}"></span>
+                    <span ng-if="item.icon && item.icon.indexOf('progress-') === 0" class="{{item.icon}}"></span>
+                </span>
+                <span class="menu-label">{{item.label}}</span>
+                <span class="menu-shortcut">{{item.shortcut}}</span>
+                <span ng-if="item.submenu" class="submenu-arrow">▶</span>
+            </div>
+            
+            <!-- 二级子菜单 -->
+            <ul ng-if="item.submenu && activeSubmenu === item.id" class="submenu" ng-style="submenuStyle">
+                <li ng-repeat="subItem in item.submenu track by $index"
+                    ng-class="{
+                        'separator': subItem.type === 'separator',
+                        'has-submenu': subItem.submenu,
+                        'active': activeSubmenu2 === subItem.id
+                    }"
+                    ng-mouseenter="onSubmenuItemEnter(subItem, $event)"
+                    ng-click="onItemClick(subItem, $event)">
+                    
+                    <div ng-if="subItem.type === 'separator'" class="separator-line"></div>
+                    
+                    <div ng-if="subItem.type !== 'separator'" class="menu-item-content">
+                        <span class="menu-icon">
+                            <i ng-if="subItem.icon && subItem.icon.indexOf('glyphicon') === 0" class="glyphicon {{subItem.icon}}"></i>
+                            <span ng-if="subItem.icon && subItem.icon.indexOf('priority-icon') === 0" class="{{subItem.icon}}"></span>
+                            <span ng-if="subItem.icon && subItem.icon.indexOf('progress-icon') === 0" class="{{subItem.icon}}"></span>
+                        </span>
+                        <span class="menu-label">{{subItem.label}}</span>
+                        <span class="menu-shortcut">{{subItem.shortcut}}</span>
+                        <span ng-if="subItem.submenu" class="submenu-arrow">▶</span>
+                    </div>
+                    
+                    <!-- 三级子菜单 -->
+                    <ul ng-if="subItem.submenu && activeSubmenu2 === subItem.id" class="submenu" ng-style="submenu2Style">
+                        <li ng-repeat="subItem2 in subItem.submenu track by $index"
+                            ng-class="{'separator': subItem2.type === 'separator'}"
+                            ng-click="onItemClick(subItem2, $event)">
+                            
+                            <div ng-if="subItem2.type === 'separator'" class="separator-line"></div>
+                            
+                            <div ng-if="subItem2.type !== 'separator'" class="menu-item-content">
+                                <span class="menu-icon">
+                                    <i ng-if="subItem2.icon && subItem2.icon.indexOf('glyphicon') === 0" class="glyphicon {{subItem2.icon}}"></i>
+                                </span>
+                                <span class="menu-label">{{subItem2.label}}</span>
+                                <span class="menu-shortcut">{{subItem2.shortcut}}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>

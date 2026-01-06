@@ -264,6 +264,14 @@ define(function(require, exports, module) {
                 'failedtoopenfile': 'Failed to open file',
                 'unsupportedformat': 'Unsupported file format',
                 'protocolnotavailable': 'Protocol manager not available'
+            },
+            'contextmenu': {
+                'insert': 'Insert',
+                'copy': 'Copy',
+                'cut': 'Cut',
+                'paste': 'Paste',
+                'clearpriority': 'Clear Priority',
+                'clearprogress': 'Clear Progress'
             }
         },
         'runtime': {

@@ -1,5 +1,5 @@
 angular.module('kityminderEditor')
-    .controller('settings.ctrl', ['$scope', '$modalInstance', 'config', 'currentLang', 'langList', 'currentThemeColor', 'systemLangStr', 'backupConfig', function ($scope, $modalInstance, config, currentLang, langList, currentThemeColor, systemLangStr, backupConfig) {
+    .controller('settings.ctrl', ['$scope', '$uibModalInstance', 'config', 'currentLang', 'langList', 'currentThemeColor', 'systemLangStr', 'backupConfig', function ($scope, $uibModalInstance, config, currentLang, langList, currentThemeColor, systemLangStr, backupConfig) {
         
         // 24个预设主题色，按色系排列 (8x3)
         $scope.themeColors = [
@@ -171,7 +171,7 @@ angular.module('kityminderEditor')
             // 保存到持久化存储
             config.save();
             
-            $modalInstance.close({
+            $uibModalInstance.close({
                 needRestart: needRestart,
                 themeColor: $scope.settings.themeColor,
                 autoBackup: $scope.settings.autoBackup,
@@ -181,7 +181,7 @@ angular.module('kityminderEditor')
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
 
     }]);

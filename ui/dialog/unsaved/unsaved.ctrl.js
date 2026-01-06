@@ -1,16 +1,16 @@
 angular.module('kityminderEditor')
-    .controller('unsaved.ctrl', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+    .controller('unsaved.ctrl', ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
         
         $scope.save = function () {
-            $modalInstance.close('save');
+            $uibModalInstance.close('save');
         };
 
         $scope.dontSave = function () {
-            $modalInstance.close('dontsave');
+            $uibModalInstance.close('dontsave');
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
 
     }]);

@@ -161,7 +161,16 @@ define(function(require, exports, module) {
             if (!minder.getSelectedNode()) {
                 return;
             }
-            fsm.jump('hotbox', 'content-menu');
+            // 触发自定义右键菜单事件，而不是 hotbox
+            // 使用 CustomEvent 直接在 document 上触发，避免 minder 事件系统的封装
+            var contextMenuEvent = new CustomEvent('minder-contextmenu', {
+                detail: {
+                    x: e.clientX,
+                    y: e.clientY,
+                    node: minder.getSelectedNode()
+                }
+            });
+            document.dispatchEvent(contextMenuEvent);
         }, false);
 
         // 阻止热盒事件冒泡，在热盒正确执行前导致热盒关闭

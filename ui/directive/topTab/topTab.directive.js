@@ -27,24 +27,27 @@ angular.module('kityminderEditor')
                 // Update dirty state on content change
                 minder.on('contentchange', function () {
                     document.setModified(true);
-                    if (!scope.$$phase) scope.$apply();
+                    // 使用 $timeout 而不是 $apply，避免嵌套 $apply 错误
+                    if (!scope.$$phase && !scope.$root.$$phase) {
+                        scope.$evalAsync();
+                    }
                 });
 
                 // 监听 document service 的事件，触发视图更新
                 scope.$on('document:pathChanged', function () {
-                    if (!scope.$$phase) scope.$apply();
+                    scope.$evalAsync();
                 });
 
                 scope.$on('document:modifiedChanged', function () {
-                    if (!scope.$$phase) scope.$apply();
+                    scope.$evalAsync();
                 });
 
                 scope.$on('document:saved', function () {
-                    if (!scope.$$phase) scope.$apply();
+                    scope.$evalAsync();
                 });
 
                 scope.$on('document:reset', function () {
-                    if (!scope.$$phase) scope.$apply();
+                    scope.$evalAsync();
                 });
 
                 scope.tabStatus = {
@@ -78,7 +81,7 @@ angular.module('kityminderEditor')
                     if (appWindow) {
                         appWindow.isMaximized().then(function (state) {
                             scope.isMaximized = state;
-                            if (!scope.$$phase) scope.$apply();
+                            scope.$evalAsync();
                         });
                     }
                 }

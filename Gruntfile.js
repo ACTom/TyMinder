@@ -255,7 +255,7 @@ module.exports = function(grunt) {
                             replacement: '<script src="js/$1"></script>'
                         },
                         {
-                            match: /<script src="ui\/kityminder\.app\.js">[\s\S]*?<script src="ui\/directive\/searchBtn\/searchBtn\.directive\.js"><\/script>/,
+                            match: /<script src="ui\/kityminder\.app\.js">[\s\S]*?<script src="ui\/directive\/contextMenu\/contextMenu\.directive\.js"><\/script>/,
                             replacement: '<script src="kityminder.editor.min.js"></script>'
                         },
                         {
