@@ -398,9 +398,10 @@ angular.module('kityminderEditor')
                     }
                 }
 
-                // 初始化时更新文件信息和备份信息
+                // 初始化时更新文件信息、备份信息和最近文件列表
                 updateFileInfo();
                 loadBackupInfo();
+                loadRecentFiles(); // 初始化时加载，避免保存时覆盖
 
                 // 监听文档路径变化
                 $scope.$on('document:pathChanged', function() {
@@ -601,6 +602,9 @@ angular.module('kityminderEditor')
                         var data = JSON.stringify(minder.exportJson());
                         native.file.save(currentFilePath, data).then(function() {
                             document.markSaved();
+                            
+                            // 保存成功后添加到最近文件列表
+                            addToRecentFiles(currentFilePath);
                             
                             // 保存成功后删除备份
                             backupService.deleteCurrentFileBackups();

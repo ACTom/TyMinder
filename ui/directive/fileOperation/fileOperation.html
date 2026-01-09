@@ -150,7 +150,7 @@
         </div>
         
         <div class="recent-file-list" ng-show="recentFiles.length > 0">
-            <div class="recent-file-item" ng-repeat="file in recentFiles" ng-click="openRecentFile(file)" title="{{file.path}}">
+            <div class="recent-file-item" ng-repeat="file in recentFiles track by file.path" ng-click="openRecentFile(file)" title="{{file.path}}">
                 <span class="recent-file-icon glyphicon glyphicon-file"></span>
                 <div class="recent-file-info">
                     <div class="recent-file-name">{{file.name}}</div>
