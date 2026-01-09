@@ -55,11 +55,11 @@
     
     <div class="modal-footer">
         <div ng-hide="showResult">
-            <button class="btn btn-default" ng-click="cancel()">{{ 'cancel' | lang: 'ui/dialog/aiexport' }}</button>
             <button class="btn btn-primary" ng-click="generate()" ng-disabled="loading">
                 <span ng-hide="loading">{{ 'generate' | lang: 'ui/dialog/aiexport' }}</span>
                 <span ng-show="loading">{{ 'generating' | lang: 'ui/dialog/aiexport' }}</span>
             </button>
+            <button class="btn btn-default" ng-click="cancel()">{{ 'cancel' | lang: 'ui/dialog/aiexport' }}</button>
         </div>
         <div ng-show="showResult">
             <button class="btn btn-default" ng-click="cancel()">{{ 'close' | lang: 'ui/dialog/aiexport' }}</button>

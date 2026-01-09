@@ -16,6 +16,7 @@ angular.module('kityminderEditor').service('revokeDialog', ['$uibModal', 'minder
                 templateUrl: 'ui/dialog/imExportNode/imExportNode.tpl.html',
                 controller: 'imExportNode.ctrl',
                 size: 'md',
+                backdrop: 'static',
                 resolve: {
                     title: function() {
                         return '导入节点';
@@ -51,6 +52,7 @@ angular.module('kityminderEditor').service('revokeDialog', ['$uibModal', 'minder
                 templateUrl: 'ui/dialog/imExportNode/imExportNode.tpl.html',
                 controller: 'imExportNode.ctrl',
                 size: 'md',
+                backdrop: 'static',
                 resolve: {
                     title: function() {
                         return '导出节点';

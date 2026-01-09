@@ -19,6 +19,7 @@ angular.module('kityminderEditor')
                         templateUrl: 'ui/dialog/image/image.tpl.html',
                         controller: 'image.ctrl',
                         size: 'md',
+                        backdrop: 'static',
                         resolve: {
                             image: function() {
                                 return image;

@@ -101,7 +101,7 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li ng-repeat="p in aiProviders">
-                                <a href ng-click="selectProvider(p.key)">{{p.label}}</a>
+                                <a href ng-click="selectProvider(p.key)">{{ getProviderLabel(p.key) }}</a>
                             </li>
                         </ul>
                     </div>
@@ -150,7 +150,8 @@
                         <input type="text" 
                                class="form-control settings-input-full" 
                                ng-model="aiSettings.apiUrl" 
-                               placeholder="https://api.example.com/v1/chat/completions">
+                               placeholder="https://api.example.com/v1/chat/completions"
+                               title="{{ 'apiurlhint' | lang: 'ui/dialog/settings'}}">
                     </div>
                     <div class="settings-row">
                         <label>{{ 'modelname' | lang: 'ui/dialog/settings'}}</label>
@@ -292,6 +293,14 @@
 .settings-input-full {
     flex: 1;
     width: 100%;
+}
+
+.settings-hint {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    color: #888;
+    font-size: 12px;
 }
 
 .backup-info {

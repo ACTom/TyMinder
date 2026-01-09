@@ -19,6 +19,7 @@ angular.module('kityminderEditor')
                         templateUrl: 'ui/dialog/hyperlink/hyperlink.tpl.html',
                         controller: 'hyperlink.ctrl',
                         size: 'md',
+                        backdrop: 'static',
                         resolve: {
                             link: function() {
                                 return link;

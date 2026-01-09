@@ -24,3 +24,18 @@
     font-size: 10px;
     top: 0;
 }
+
+// 当模态框打开时，禁用窗口控制按钮
+body.modal-open .window-controls-container {
+    pointer-events: none;
+    
+    .window-control-btn {
+        pointer-events: none;
+        opacity: 0.5;
+        cursor: default;
+        
+        &:hover {
+            background-color: transparent;
+        }
+    }
+}

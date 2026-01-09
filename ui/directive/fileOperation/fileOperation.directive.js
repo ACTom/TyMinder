@@ -1,5 +1,5 @@
 angular.module('kityminderEditor')
-    .directive('fileOperation', ['native', 'document', '$uibModal', '$q', 'config', 'backupService', function(native, document, $modal, $q, config, backupService) {
+    .directive('fileOperation', ['native', 'document', '$uibModal', '$q', 'config', 'backupService', '$rootScope', function(native, document, $modal, $q, config, backupService, $rootScope) {
         return {
             restrict: 'E',
             templateUrl: 'ui/directive/fileOperation/fileOperation.html',
@@ -13,6 +13,20 @@ angular.module('kityminderEditor')
 
                 // 初始化备份服务
                 backupService.init(minder);
+
+                // 应用版本号（从 Tauri 读取）
+                $scope.appVersion = '0.0.0';
+                (function loadAppVersion() {
+                    var tauri = window.__TAURI__ || {};
+                    if (tauri.app && tauri.app.getVersion) {
+                        tauri.app.getVersion().then(function(version) {
+                            $scope.appVersion = version;
+                            if (!$scope.$$phase && !$scope.$root.$$phase) {
+                                $scope.$apply();
+                            }
+                        });
+                    }
+                })();
 
                 // 当前激活的菜单面板
                 $scope.activeMenu = 'info';
@@ -77,6 +91,7 @@ angular.module('kityminderEditor')
                             templateUrl: 'ui/dialog/settings/settings.tpl.html',
                             controller: 'settings.ctrl',
                             size: 'md',
+                            backdrop: 'static',
                             resolve: {
                                 config: function() { return config; },
                                 currentLang: function() { return currentLang; },
@@ -105,6 +120,8 @@ angular.module('kityminderEditor')
                                     });
                                 }
                             }
+                            // 通知 AI 配置已更新
+                            $rootScope.$broadcast('ai:configSaved');
                         }).catch(function() {
                             // 用户取消
                         });
@@ -432,7 +449,8 @@ angular.module('kityminderEditor')
                         animation: true,
                         templateUrl: 'ui/dialog/unsaved/unsaved.tpl.html',
                         controller: 'unsaved.ctrl',
-                        size: 'md'
+                        size: 'md',
+                        backdrop: 'static'
                     });
 
                     unsavedModal.result.then(function(result) {
@@ -695,6 +713,7 @@ angular.module('kityminderEditor')
                         templateUrl: 'ui/dialog/exportMarkdown/exportMarkdown.tpl.html',
                         controller: 'exportMarkdown.ctrl',
                         size: 'md',
+                        backdrop: 'static',
                         resolve: {
                             minder: function() { return minder; },
                             exportCallback: function() { return null; }

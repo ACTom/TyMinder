@@ -20,8 +20,18 @@ angular.module('kityminderEditor')
                 $scope.aiConfigured = false;
                 
                 // 检查 AI 配置
-                aiService.isConfigured().then(function(configured) {
-                    $scope.aiConfigured = configured;
+                function checkAIConfig() {
+                    aiService.isConfigured().then(function(configured) {
+                        $scope.aiConfigured = configured;
+                    });
+                }
+                
+                // 初始化时检查
+                checkAIConfig();
+                
+                // 监听设置保存事件
+                $scope.$on('ai:configSaved', function() {
+                    checkAIConfig();
                 });
 
                 // 菜单状态
@@ -155,7 +165,7 @@ angular.module('kityminderEditor')
                             shortcut: 'Ctrl+V',
                             action: function() { doPaste(); }
                         },
-                        { type: 'separator' },
+                        { type: 'separator', id: 'separator_before_ai' },
                         {
                             id: 'ai',
                             label: lang('ai', 'ui/contextmenu') || 'AI',
@@ -320,6 +330,7 @@ angular.module('kityminderEditor')
                     // 弹出层级选择对话框
                     var expandModal = $modal.open({
                         animation: true,
+                        backdrop: 'static',
                         template: '<div class="modal-header" style="background-color: var(--theme-color, #fc8383); color: white;">' +
                             '<h4 class="modal-title">' + (lang('aiexpand', 'ui/contextmenu') || 'AI 扩展') + '</h4></div>' +
                             '<div class="modal-body">' +

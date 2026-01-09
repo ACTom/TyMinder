@@ -41,13 +41,13 @@ angular.module('kityminderEditor')
             { id: 'darkblue', color: '#34495e', name: 'Dark Blue' }
         ];
 
-        // AI 提供商列表
+        // AI 提供商列表（key 用于翻译）
         $scope.aiProviders = [
-            { key: 'openai', label: 'OpenAI' },
-            { key: 'claude', label: 'Claude (Anthropic)' },
-            { key: 'qwen', label: '通义千问 (Qwen)' },
-            { key: 'deepseek', label: 'DeepSeek' },
-            { key: 'custom', label: '自定义 (Custom)' }
+            { key: 'openai' },
+            { key: 'claude' },
+            { key: 'qwen' },
+            { key: 'deepseek' },
+            { key: 'custom' }
         ];
 
         // 当前设置
@@ -143,12 +143,11 @@ angular.module('kityminderEditor')
             return key;
         };
 
-        // 获取提供商标签
+        // 获取提供商标签（通过翻译）
         $scope.getProviderLabel = function(key) {
-            for (var i = 0; i < $scope.aiProviders.length; i++) {
-                if ($scope.aiProviders[i].key === key) {
-                    return $scope.aiProviders[i].label;
-                }
+            var lang = window.editor && window.editor.lang;
+            if (lang) {
+                return lang.t('provider_' + key, 'ui/dialog/settings') || key;
             }
             return key;
         };
@@ -163,6 +162,11 @@ angular.module('kityminderEditor')
             $scope.aiSettings.provider = provider;
             // 切换提供商时清空测试结果
             $scope.aiTestResult = '';
+            // 如果不是 custom，清空自定义 URL 和模型
+            if (provider !== 'custom') {
+                $scope.aiSettings.apiUrl = '';
+                $scope.aiSettings.model = '';
+            }
         };
 
         // 选择主题色
@@ -198,7 +202,9 @@ angular.module('kityminderEditor')
                 }).then(function() {
                     return core.invoke('test_ai_config', {});
                 }).then(function(result) {
-                    $scope.aiTestResult = '✓ ' + result;
+                    var lang = window.editor && window.editor.lang;
+                    var successMsg = lang ? lang.t('aitestsuccess', 'ui/dialog/settings') : '测试通过';
+                    $scope.aiTestResult = '✓ ' + successMsg;
                     $scope.aiTestSuccess = true;
                     $scope.aiSettings.hasApiKey = true;
                     $scope.aiSettings.testPassed = true;
@@ -218,7 +224,9 @@ angular.module('kityminderEditor')
                 $scope.aiTestResult = '';
                 
                 core.invoke('test_ai_config', {}).then(function(result) {
-                    $scope.aiTestResult = '✓ ' + result;
+                    var lang = window.editor && window.editor.lang;
+                    var successMsg = lang ? lang.t('aitestsuccess', 'ui/dialog/settings') : '测试通过';
+                    $scope.aiTestResult = '✓ ' + successMsg;
                     $scope.aiTestSuccess = true;
                     $scope.aiSettings.testPassed = true;
                     $scope.$apply();
@@ -232,7 +240,9 @@ angular.module('kityminderEditor')
                     $scope.$apply();
                 });
             } else {
-                $scope.aiTestResult = '请先输入 API Key';
+                var lang = window.editor && window.editor.lang;
+                var msg = lang ? lang.t('ainotconfigured', 'ui/dialog/settings') : '请先输入 API Key';
+                $scope.aiTestResult = msg;
                 $scope.aiTestSuccess = false;
             }
         };

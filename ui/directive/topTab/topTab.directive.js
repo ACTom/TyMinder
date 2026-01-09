@@ -123,7 +123,8 @@ angular.module('kityminderEditor')
                         animation: true,
                         templateUrl: 'ui/dialog/unsaved/unsaved.tpl.html',
                         controller: 'unsaved.ctrl',
-                        size: 'md'
+                        size: 'md',
+                        backdrop: 'static'
                     });
 
                     unsavedModal.result.then(function(result) {

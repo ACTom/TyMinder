@@ -518,8 +518,9 @@ fn get_ai_config_internal(app: &tauri::AppHandle) -> Result<AiConfig, String> {
 
 /// 根据提供商获取 API URL
 fn get_api_url(config: &AiConfig) -> String {
-    if !config.api_url.is_empty() {
-        return config.api_url.clone();
+    // 只有 custom 模式才使用自定义 URL
+    if config.provider == "custom" && !config.api_url.is_empty() {
+        return normalize_api_url(&config.api_url);
     }
     
     match config.provider.as_str() {
@@ -527,8 +528,37 @@ fn get_api_url(config: &AiConfig) -> String {
         "claude" => "https://api.anthropic.com/v1/messages".to_string(),
         "qwen" => "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions".to_string(),
         "deepseek" => "https://api.deepseek.com/v1/chat/completions".to_string(),
-        _ => config.api_url.clone(),
+        _ => normalize_api_url(&config.api_url),
     }
+}
+
+/// 规范化 API URL，智能补全路径
+fn normalize_api_url(url: &str) -> String {
+    let url = url.trim();
+    if url.is_empty() {
+        return String::new();
+    }
+    
+    // 如果已经是完整路径，直接返回
+    if url.ends_with("/chat/completions") {
+        return url.to_string();
+    }
+    
+    // 如果以 /v1/ 或 /v1 结尾，补全 chat/completions
+    if url.ends_with("/v1/") {
+        return format!("{}chat/completions", url);
+    }
+    if url.ends_with("/v1") {
+        return format!("{}/chat/completions", url);
+    }
+    
+    // 如果以 / 结尾，补全 v1/chat/completions
+    if url.ends_with('/') {
+        return format!("{}v1/chat/completions", url);
+    }
+    
+    // 否则补全 /v1/chat/completions
+    format!("{}/v1/chat/completions", url)
 }
 
 /// 根据提供商获取默认模型
@@ -628,7 +658,7 @@ async fn ai_chat(
 #[tauri::command]
 async fn test_ai_config(app: tauri::AppHandle) -> Result<String, String> {
     let messages = vec![json!({"role": "user", "content": "Say 'Hello' in one word."})];
-    let result = ai_chat(app.clone(), messages, None).await?;
+    let _result = ai_chat(app.clone(), messages, None).await?;
     
     // 测试成功，更新 test_passed 状态
     let config_path = app.path().app_config_dir()
@@ -644,7 +674,8 @@ async fn test_ai_config(app: tauri::AppHandle) -> Result<String, String> {
         }
     }
     
-    Ok(result)
+    // 返回成功标识，前端根据此显示国际化消息
+    Ok("OK".to_string())
 }
 
 /// 生成唯一的窗口标签

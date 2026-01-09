@@ -113,7 +113,7 @@ git clone https://github.com/ACtom/TyMinder.git
 cd TyMinder
 
 # 安装依赖
-npm run install
+npm run init
 
 # 启动 Tauri 开发模式
 npm run tauri dev

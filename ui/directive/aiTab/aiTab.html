@@ -1,49 +1,57 @@
 <div class="ai-tab-container">
     <!-- AI 生成导图 -->
-    <div class="km-btn-group ai-generate-group">
-        <div class="km-btn-item ai-generate"
-             ng-class="{'disabled': !aiConfigured}"
-             ng-click="showAIGenerate()"
-             title="{{ 'aigenerate' | lang:'ui/aitab' }}">
-            <i class="km-btn-icon"></i>
-            <span class="km-btn-caption">{{ 'aigenerate' | lang:'ui/aitab' }}</span>
-        </div>
+    <div class="btn-group-vertical ai-btn-group"
+         ng-class="{'disabled': !aiConfigured}"
+         ng-click="aiConfigured && showAIGenerate()"
+         title="{{ 'aigenerate' | lang:'ui/aitab' }}">
+        <button type="button" class="btn btn-default ai-icon ai-generate-icon"></button>
+        <button type="button" class="btn btn-default ai-caption">
+            <span class="caption">{{ 'aigenerate' | lang:'ui/aitab' }}</span>
+        </button>
     </div>
 
     <!-- AI 问答 -->
-    <div class="km-btn-group ai-chat-group">
-        <div class="km-btn-item ai-chat"
-             ng-class="{'disabled': !aiConfigured}"
-             ng-click="showAIChat()"
-             title="{{ 'aichat' | lang:'ui/aitab' }}">
-            <i class="km-btn-icon"></i>
-            <span class="km-btn-caption">{{ 'aichat' | lang:'ui/aitab' }}</span>
-        </div>
+    <div class="btn-group-vertical ai-btn-group"
+         ng-class="{'disabled': !aiConfigured}"
+         ng-click="aiConfigured && showAIChat()"
+         title="{{ 'aichat' | lang:'ui/aitab' }}">
+        <button type="button" class="btn btn-default ai-icon ai-chat-icon"></button>
+        <button type="button" class="btn btn-default ai-caption">
+            <span class="caption">{{ 'aichat' | lang:'ui/aitab' }}</span>
+        </button>
     </div>
 
-    <!-- AI 导出 -->
-    <div class="km-btn-group ai-export-group">
-        <div class="km-btn-item ai-export-article"
-             ng-class="{'disabled': !aiConfigured}"
-             ng-click="showAIExportArticle()"
-             title="{{ 'aiexportarticle' | lang:'ui/aitab' }}">
-            <i class="km-btn-icon"></i>
-            <span class="km-btn-caption">{{ 'aiexportarticle' | lang:'ui/aitab' }}</span>
-        </div>
-        <div class="km-btn-item ai-export-report"
-             ng-class="{'disabled': !aiConfigured}"
-             ng-click="showAIExportReport()"
-             title="{{ 'aiexportreport' | lang:'ui/aitab' }}">
-            <i class="km-btn-icon"></i>
-            <span class="km-btn-caption">{{ 'aiexportreport' | lang:'ui/aitab' }}</span>
-        </div>
-        <div class="km-btn-item ai-export-ppt"
-             ng-class="{'disabled': !aiConfigured}"
-             ng-click="showAIExportPPT()"
-             title="{{ 'aiexportppt' | lang:'ui/aitab' }}">
-            <i class="km-btn-icon"></i>
-            <span class="km-btn-caption">{{ 'aiexportppt' | lang:'ui/aitab' }}</span>
-        </div>
+    <!-- AI 导出文章 -->
+    <div class="btn-group-vertical ai-btn-group"
+         ng-class="{'disabled': !aiConfigured}"
+         ng-click="aiConfigured && showAIExportArticle()"
+         title="{{ 'aiexportarticle' | lang:'ui/aitab' }}">
+        <button type="button" class="btn btn-default ai-icon ai-export-article-icon"></button>
+        <button type="button" class="btn btn-default ai-caption">
+            <span class="caption">{{ 'aiexportarticle' | lang:'ui/aitab' }}</span>
+        </button>
+    </div>
+
+    <!-- AI 导出报告 -->
+    <div class="btn-group-vertical ai-btn-group"
+         ng-class="{'disabled': !aiConfigured}"
+         ng-click="aiConfigured && showAIExportReport()"
+         title="{{ 'aiexportreport' | lang:'ui/aitab' }}">
+        <button type="button" class="btn btn-default ai-icon ai-export-report-icon"></button>
+        <button type="button" class="btn btn-default ai-caption">
+            <span class="caption">{{ 'aiexportreport' | lang:'ui/aitab' }}</span>
+        </button>
+    </div>
+
+    <!-- AI 导出 PPT -->
+    <div class="btn-group-vertical ai-btn-group"
+         ng-class="{'disabled': !aiConfigured}"
+         ng-click="aiConfigured && showAIExportPPT()"
+         title="{{ 'aiexportppt' | lang:'ui/aitab' }}">
+        <button type="button" class="btn btn-default ai-icon ai-export-ppt-icon"></button>
+        <button type="button" class="btn btn-default ai-caption">
+            <span class="caption">{{ 'aiexportppt' | lang:'ui/aitab' }}</span>
+        </button>
     </div>
 
     <!-- 未配置提示 -->

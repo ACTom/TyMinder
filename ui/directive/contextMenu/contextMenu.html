@@ -1,6 +1,7 @@
 <div class="km-context-menu" ng-show="visible" ng-style="{'left': menuX + 'px', 'top': menuY + 'px'}">
     <ul class="menu-list">
         <li ng-repeat="item in menuItems track by $index"
+            ng-if="(item.id !== 'ai' && item.id !== 'separator_before_ai') || aiConfigured"
             ng-class="{
                 'separator': item.type === 'separator',
                 'has-submenu': item.submenu,

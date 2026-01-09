@@ -43,6 +43,7 @@ angular.module('kityminderEditor')
                         templateUrl: 'ui/dialog/aiGenerate/aiGenerate.tpl.html',
                         controller: 'aiGenerate.ctrl',
                         size: 'md',
+                        backdrop: 'static',
                         resolve: {
                             aiService: function() { return aiService; },
                             minder: function() { return minder; }
@@ -130,6 +131,7 @@ angular.module('kityminderEditor')
                         templateUrl: 'ui/dialog/aiExport/aiExport.tpl.html',
                         controller: 'aiExport.ctrl',
                         size: 'lg',
+                        backdrop: 'static',
                         resolve: {
                             aiService: function() { return aiService; },
                             minder: function() { return minder; },
