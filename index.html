@@ -122,8 +122,8 @@
     
     // 在 release 模式下禁用 F5 刷新和右键菜单
     (function() {
-        var isDevMode = window.location.hostname === 'localhost' || 
-                        window.location.hostname === '127.0.0.1';
+        // 开发模式使用 http:// 协议，生产模式使用 tauri:// 或 https://tauri.localhost
+        var isDevMode = window.location.protocol === 'http:';
         
         if (!isDevMode) {
             document.addEventListener('keydown', function(e) {

@@ -104,28 +104,43 @@ pub fn create_window(app: &tauri::AppHandle, file_path: Option<&str>, is_temp: b
     #[cfg(not(debug_assertions))]
     let url = tauri::WebviewUrl::App("index.html".into());
 
+    #[cfg(target_os = "windows")]
     let builder = tauri::WebviewWindowBuilder::new(app, &label, url)
         .title("TyMinder")
         .inner_size(window_state.width, window_state.height)
-        .min_inner_size(800.0, 400.0)  // 最小窗口尺寸
+        .min_inner_size(1000.0, 600.0)
         .position(window_state.x as f64, window_state.y as f64)
         .decorations(false)
-        .drag_and_drop(true)  // 启用文件拖拽
         .initialization_script(&init_script)
-        .on_navigation(|url| {
-            // 拦截外部链接导航，只允许应用内部 URL
+        .on_navigation(|url: &tauri::Url| {
             let url_str = url.as_str();
-            // 允许 localhost 和 tauri 内部 URL
-            if url_str.starts_with("http://localhost") 
+            url_str.starts_with("http://localhost") 
                 || url_str.starts_with("https://localhost")
                 || url_str.starts_with("tauri://")
                 || url_str.starts_with("https://tauri.localhost")
-                || url_str.starts_with("http://tauri.localhost") {
-                true  // 允许导航
-            } else {
-                false  // 阻止外部链接导航，由前端处理
-            }
+                || url_str.starts_with("http://tauri.localhost")
         });
+    
+    #[cfg(not(target_os = "windows"))]
+    let builder = tauri::WebviewWindowBuilder::new(app, &label, url)
+        .title("TyMinder")
+        .inner_size(window_state.width, window_state.height)
+        .min_inner_size(1000.0, 600.0)
+        .position(window_state.x as f64, window_state.y as f64)
+        .decorations(false)
+        .initialization_script(&init_script)
+        .on_navigation(|url: &tauri::Url| {
+            let url_str = url.as_str();
+            url_str.starts_with("http://localhost") 
+                || url_str.starts_with("https://localhost")
+                || url_str.starts_with("tauri://")
+                || url_str.starts_with("https://tauri.localhost")
+                || url_str.starts_with("http://tauri.localhost")
+        });
+    
+    // Windows 平台启用文件拖拽
+    #[cfg(target_os = "windows")]
+    let builder = builder.drag_and_drop(true);
     
     let window = builder.build()?;
     

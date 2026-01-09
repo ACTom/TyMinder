@@ -220,6 +220,23 @@ angular.module('kityminderEditor')
                 // 设置窗口关闭处理器
                 setupWindowCloseHandler();
 
+                // 动态调整拖动区域位置，根据标签页实际宽度
+                function updateDragRegionPosition() {
+                    var dragRegion = window.document.querySelector('.window-drag-region');
+                    if (!dragRegion) return;
+                    
+                    // 获取所有标签项，计算最后一个的右边界
+                    var tabItems = window.document.querySelectorAll('.nav-tabs > li');
+                    if (tabItems.length > 0) {
+                        var lastTab = tabItems[tabItems.length - 1];
+                        var rect = lastTab.getBoundingClientRect();
+                        dragRegion.style.left = (rect.right + 10) + 'px'; // 最后一个标签的右边界 + 10px 边距
+                    }
+                }
+                
+                // 延迟执行，等待 DOM 渲染完成
+                setTimeout(updateDragRegionPosition, 200);
+
                 /*
                 *
                 * 用户选择一个新的选项卡会执行 setCurTab 和 foldTopTab 两个函数

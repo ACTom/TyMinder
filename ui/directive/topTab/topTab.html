@@ -1,5 +1,6 @@
-<div class="window-controls-container" data-tauri-drag-region style="position: absolute; top: 0; right: 0; left: 0; height: 32px; z-index: 10000; display: flex; justify-content: flex-end; align-items: flex-start; pointer-events: none;">
-    <div style="margin-right: auto; margin-left: auto; height: 32px; font-size: 12px; color: rgba(255,255,255,0.9); display: flex; align-items: center;">
+<div class="window-controls-container" style="position: absolute; top: 0; right: 0; left: 0; height: 32px; z-index: 10000; display: flex; justify-content: flex-end; align-items: flex-start; pointer-events: none;">
+    <!-- 拖动区域 + 标题显示，位置由 JS 动态设置 -->
+    <div class="window-drag-region" data-tauri-drag-region style="position: absolute; top: 0; left: 280px; right: 120px; height: 32px; pointer-events: auto; display: flex; align-items: center; justify-content: center; font-size: 12px; color: rgba(255,255,255,0.9); cursor: default; user-select: none;">
         {{getTitle()}}
     </div>
     <div style="pointer-events: auto;">
