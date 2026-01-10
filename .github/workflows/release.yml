@@ -1,0 +1,90 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest' # Apple Silicon (arm64)
+            os: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-intel' # Intel (x64)
+            os: 'macos-15-intel'
+            args: '--target x86_64-apple-darwin'
+          - platform: 'windows-x86_64'
+            os: 'windows-latest'
+            args: ''
+          - platform: 'linux-x86_64'
+            os: 'ubuntu-22.04'
+            args: ''
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || matrix.platform == 'macos-intel' && 'x86_64-apple-darwin' || '' }}
+
+      - name: install dependencies (ubuntu)
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: install bower
+        run: npm install -g bower
+
+      - name: bower install
+        run: bower install
+
+      - name: npm install
+        run: npm install
+
+      - name: Build and Upload
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'TyMinder ${{ github.ref_name }}'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+      - name: Upload Raw Binary (Windows)
+        if: matrix.platform == 'windows-x86_64'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp src-tauri/target/release/TyMinder.exe TyMinder_${{ env.VERSION }}_x64.exe
+          gh release upload ${{ github.ref_name }} TyMinder_${{ env.VERSION }}_x64.exe
+
+      - name: Upload Raw Binary (Linux x86_64)
+        if: matrix.platform == 'linux-x86_64'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BIN_PATH="src-tauri/target/release/tyminder"
+          NEW_NAME="TyMinder_${{ env.VERSION }}_x86_64"
+          cp "$BIN_PATH" "$NEW_NAME"
+          gh release upload ${{ github.ref_name }} "$NEW_NAME"
