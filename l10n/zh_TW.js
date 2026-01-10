@@ -250,6 +250,7 @@ define(function(require, exports, module) {
                     'testapikey': '測試連線',
                     'testing': '測試中...',
                     'aitestsuccess': '測試通過',
+                    'getapikey': '獲取 API Key',
                     'aitestpassed': 'AI 設定已驗證，可以正常使用',
                     'airequiretest': '請點擊「測試連線」驗證設定',
                     'ainotconfigured': '請輸入 API Key 並測試連線',

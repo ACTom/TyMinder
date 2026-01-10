@@ -36,7 +36,15 @@ define(function(require, exports, module) {
             lang = native.app.getSystemLocaleSync();
             // For all languages except Chinese, use the first two characters
             if (lang.startsWith('zh')) {
-                lang = lang.replace('-', '_');
+                // Handle zh-Hans (Simplified) and zh-Hant (Traditional)
+                if (lang.indexOf('Hans') !== -1 || lang.indexOf('CN') !== -1) {
+                    lang = 'zh_CN';
+                } else if (lang.indexOf('Hant') !== -1 || lang.indexOf('TW') !== -1 || lang.indexOf('HK') !== -1) {
+                    lang = 'zh_TW';
+                } else {
+                    // Default to zh_CN for other zh variants
+                    lang = 'zh_CN';
+                }
             } else {
                 lang = lang.substring(0, 2);
             }

@@ -34,6 +34,19 @@ define(function(require, exports, module) {
         },
 
         /**
+         * 获取当前平台
+         * @returns {string} 'macos' | 'windows' | 'linux' | 'web'
+         */
+        getPlatform: function() {
+            if (!isTauri) return 'web';
+            var userAgent = navigator.userAgent.toLowerCase();
+            if (userAgent.indexOf('mac') !== -1) return 'macos';
+            if (userAgent.indexOf('win') !== -1) return 'windows';
+            if (userAgent.indexOf('linux') !== -1) return 'linux';
+            return 'unknown';
+        },
+
+        /**
          * 窗口相关操作
          */
         window: {

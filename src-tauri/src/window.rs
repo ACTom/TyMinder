@@ -104,31 +104,19 @@ pub fn create_window(app: &tauri::AppHandle, file_path: Option<&str>, is_temp: b
     #[cfg(not(debug_assertions))]
     let url = tauri::WebviewUrl::App("index.html".into());
 
-    #[cfg(target_os = "windows")]
     let builder = tauri::WebviewWindowBuilder::new(app, &label, url)
         .title("TyMinder")
         .inner_size(window_state.width, window_state.height)
         .min_inner_size(1000.0, 600.0)
-        .position(window_state.x as f64, window_state.y as f64)
-        .decorations(false)
-        .initialization_script(&init_script)
-        .on_navigation(|url: &tauri::Url| {
-            let url_str = url.as_str();
-            url_str.starts_with("http://localhost") 
-                || url_str.starts_with("https://localhost")
-                || url_str.starts_with("tauri://")
-                || url_str.starts_with("https://tauri.localhost")
-                || url_str.starts_with("http://tauri.localhost")
-        });
-    
-    #[cfg(not(target_os = "windows"))]
-    let builder = tauri::WebviewWindowBuilder::new(app, &label, url)
-        .title("TyMinder")
-        .inner_size(window_state.width, window_state.height)
-        .min_inner_size(1000.0, 600.0)
-        .position(window_state.x as f64, window_state.y as f64)
-        .decorations(false)
-        .initialization_script(&init_script)
+        .position(window_state.x as f64, window_state.y as f64);
+
+    #[cfg(target_os = "macos")]
+    let builder = builder.hidden_title(true).title_bar_style(tauri::TitleBarStyle::Overlay);
+
+    #[cfg(not(target_os = "macos"))]
+    let builder = builder.decorations(false);
+
+    let builder = builder.initialization_script(&init_script)
         .on_navigation(|url: &tauri::Url| {
             let url_str = url.as_str();
             url_str.starts_with("http://localhost") 

@@ -10,6 +10,9 @@ angular.module('kityminderEditor')
             link: function (scope) {
                 var minder = scope.minder;
 
+                // 平台检测
+                scope.isMacOS = native.getPlatform && native.getPlatform() === 'macos';
+
                 // File status - 从 document service 获取
                 // 设置默认文件名（支持国际化）
                 if (scope.editor && scope.editor.lang) {

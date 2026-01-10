@@ -250,6 +250,7 @@ define(function(require, exports, module) {
                     'testapikey': 'Verbindung testen',
                     'testing': 'Teste...',
                     'aitestsuccess': 'Test erfolgreich',
+                    'getapikey': 'API-Schlüssel abrufen',
                     'aitestpassed': 'KI-Konfiguration verifiziert, einsatzbereit',
                     'airequiretest': 'Bitte "Verbindung testen" klicken',
                     'ainotconfigured': 'Bitte API-Schlüssel eingeben und testen',

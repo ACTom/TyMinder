@@ -1,8 +1,8 @@
 [package]
 name = "tyminder"
-version = "0.2.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "0.2.1"
+description = "A powerful, lightweight, and cross-platform mind mapping desktop application."
+authors = ["ACTom <i@actom.me>"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

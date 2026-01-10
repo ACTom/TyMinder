@@ -34,6 +34,10 @@ angular.module('kityminderEditor')
             get: function() { return getImpl().app; }
         });
 
+        Object.defineProperty(this, 'getPlatform', {
+            get: function() { return getImpl().getPlatform; }
+        });
+
         Object.defineProperty(this, 'invoke', {
             get: function() { return getImpl().invoke; }
         });

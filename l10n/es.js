@@ -250,6 +250,7 @@ define(function(require, exports, module) {
                     'testapikey': 'Probar conexión',
                     'testing': 'Probando...',
                     'aitestsuccess': 'Prueba exitosa',
+                    'getapikey': 'Obtener clave API',
                     'aitestpassed': 'Configuración de IA verificada, lista para usar',
                     'airequiretest': 'Haga clic en "Probar conexión"',
                     'ainotconfigured': 'Ingrese la clave API y pruebe',

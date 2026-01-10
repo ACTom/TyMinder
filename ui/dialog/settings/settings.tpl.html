@@ -105,6 +105,14 @@
                             </li>
                         </ul>
                     </div>
+                    
+                    <a href="{{ getApiKeyUrl(aiSettings.provider) }}" 
+                       target="_blank" 
+                       class="btn btn-sm btn-default" 
+                       style="margin-left: 10px;"
+                       ng-if="aiSettings.provider !== 'custom'">
+                        <i class="glyphicon glyphicon-link"></i> {{ 'getapikey' | lang: 'ui/dialog/settings'}}
+                    </a>
                 </div>
             </div>
             

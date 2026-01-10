@@ -1,4 +1,10 @@
 .top-tab {
+    -webkit-user-select: none;
+    user-select: none;
+
+    .macos-padding .nav-tabs {
+        padding-left: 80px;
+    }
 
     .nav-tabs {
         background-color: var(--theme-color, #fc8383);
@@ -66,6 +72,8 @@
     margin: 0 3px;
     font-size: 0;
     cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
 
     &[disabled] {
         opacity: 0.5;

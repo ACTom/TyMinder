@@ -33,6 +33,13 @@
 - **Search** - Quick search within mind map nodes
 - **Auto Backup** - Automatic backup with configurable interval
 
+## AI Assistant
+
+- **Multi-Model Support** - Support for OpenAI, Claude, Qwen, DeepSeek, and Custom models
+- **One-Click Generation** - Generate complete mind maps from a single topic
+- **Smart Chat** - Built-in AI chat panel for instant inspiration
+- **Content Optimization** - Intelligent rewrite, expand, and polish node content
+
 ## Screenshots
 
 

@@ -152,6 +152,17 @@ angular.module('kityminderEditor')
             return key;
         };
 
+        // 获取 API Key 申请链接
+        $scope.getApiKeyUrl = function(provider) {
+            switch(provider) {
+                case 'openai': return 'https://platform.openai.com/api-keys';
+                case 'claude': return 'https://console.anthropic.com/settings/keys';
+                case 'qwen': return 'https://bailian.console.aliyun.com/?apiKey=1';
+                case 'deepseek': return 'https://platform.deepseek.com/api_keys';
+                default: return '';
+            }
+        };
+
         // 选择语言
         $scope.selectLang = function(lang) {
             $scope.settings.lang = lang;
