@@ -343,15 +343,15 @@ angular.module('kityminderEditor')
                         }
                     }
                     
-                    // Ctrl+S - 保存（广播事件，由 fileOperation 处理）
-                    if (e.ctrlKey && e.key === 's') {
+                    // Ctrl+S / Cmd+S - 保存（广播事件，由 fileOperation 处理）
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                         e.preventDefault();
                         $rootScope.$broadcast('file:save');
                         return;
                     }
                     
-                    // Ctrl+O - 打开（广播事件，由 fileOperation 处理）
-                    if (e.ctrlKey && e.key === 'o') {
+                    // Ctrl+O / Cmd+O - 打开（广播事件，由 fileOperation 处理）
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
                         e.preventDefault();
                         $rootScope.$broadcast('file:open');
                         return;

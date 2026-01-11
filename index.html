@@ -127,8 +127,8 @@
         
         if (!isDevMode) {
             document.addEventListener('keydown', function(e) {
-                // 禁用 F5 和 Ctrl+R 刷新
-                if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+                // 禁用 F5 和 Ctrl+R / Cmd+R 刷新
+                if (e.key === 'F5' || ((e.ctrlKey || e.metaKey) && e.key === 'r')) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;

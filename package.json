@@ -1,6 +1,6 @@
 {
   "name": "tyminder",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A powerful, lightweight, and cross-platform mind mapping desktop application.",
   "scripts": {
     "init": "npm i -g wr && npm install -g less && npm install -g bower && bower install && npm install",

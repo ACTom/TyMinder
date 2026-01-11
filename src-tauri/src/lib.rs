@@ -15,6 +15,8 @@ mod crypto;
 mod ai;
 mod window;
 
+use tauri::Manager;
+
 // 重导出命令函数
 pub use config::{get_config, set_config, get_system_locale};
 pub use file::{save_file, save_file_base64, read_file, read_file_binary, get_file_info, save_temp_file, cleanup_temp_file};
@@ -26,14 +28,19 @@ pub use window::{new_window, create_window};
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let args: Vec<String> = std::env::args().collect();
-            let is_temp = args.iter().any(|arg| arg == "--temp");
-            let file_path = args.iter()
-                .skip(1)
-                .find(|arg| !arg.starts_with('-'))
-                .map(|s| s.as_str());
-            
-            create_window(app.handle(), file_path, is_temp)?;
+            #[cfg(target_os = "macos")]
+            let _ = app;
+
+            #[cfg(not(target_os = "macos"))]
+            {
+                let args: Vec<String> = std::env::args().collect();
+                let is_temp = args.iter().any(|arg| arg == "--temp");
+                let file_path = args.iter()
+                    .skip(1)
+                    .find(|arg| !arg.starts_with('-'))
+                    .map(|s| s.as_str());
+                create_window(app.handle(), file_path, is_temp)?;
+            }
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
@@ -66,6 +73,33 @@ pub fn run() {
             // 窗口
             new_window,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app_handle, event| {
+            #[cfg(target_os = "macos")]
+            match event {
+                tauri::RunEvent::Opened { urls } => {
+                    for url in urls {
+                        if url.scheme() == "file" {
+                            if let Ok(path) = url.to_file_path() {
+                                let path_str = path.to_string_lossy();
+                                let _ = create_window(app_handle, Some(&path_str), false);
+                            }
+                        }
+                    }
+                }
+                tauri::RunEvent::Ready => {
+                    let app_handle = app_handle.clone();
+                    tauri::async_runtime::spawn(async move {
+                        // 延迟 300ms 等待可能的 Opened 事件触发
+                        tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+                        
+                        if app_handle.webview_windows().is_empty() {
+                            let _ = create_window(&app_handle, None, false);
+                        }
+                    });
+                }
+                _ => {}
+            }
+        });
 }
