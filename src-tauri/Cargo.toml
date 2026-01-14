@@ -1,6 +1,6 @@
 [package]
 name = "tyminder"
-version = "0.2.2"
+version = "0.3.0"
 description = "A powerful, lightweight, and cross-platform mind mapping desktop application."
 authors = ["ACTom <i@actom.me>"]
 edition = "2021"
