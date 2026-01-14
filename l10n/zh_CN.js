@@ -169,9 +169,12 @@ define(function(require, exports, module) {
                 'add': '添加'
             },
             'link': '链接',
+            'connection': '连接线',
+            'editconnectiontext': '输入连接线文字（留空则删除）:',
             'image': '图片',
             'note': '备注',
             'insertlink': '插入链接',
+            'insertconnection': '添加连接线',
             'insertimage': '插入图片',
             'insertnote': '插入备注',
             'removelink': '移除已有链接',

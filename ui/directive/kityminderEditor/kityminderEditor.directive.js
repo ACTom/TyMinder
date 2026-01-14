@@ -149,6 +149,56 @@ angular.module('kityminderEditor')
 					}
 				}
 
+				/**
+				 * 设置 Delete 键删除选中的连接线
+				 */
+				function setupHyperConnectionDelete(minder) {
+					document.addEventListener('keydown', function(e) {
+						// Delete 键 (keyCode 46)
+						if (e.keyCode === 46) {
+							// 检查是否有选中的连接线
+							var container = minder._hyperConnectionContainer;
+							if (!container) return;
+							
+							var shapes = container.getShapes();
+							for (var i = 0; i < shapes.length; i++) {
+								var shape = shapes[i];
+								if (shape.isSelected && shape.data) {
+									// 找到选中的连接线，删除它
+									minder.execCommand('RemoveHyperConnection', shape.data.id);
+									e.preventDefault();
+									e.stopPropagation();
+									return;
+								}
+							}
+						}
+					});
+				}
+
+				/**
+				 * 设置双击连接线编辑文字
+				 */
+				function setupHyperConnectionEdit(minder, editor) {
+					minder.on('hyperconnectiondblclick', function(e) {
+						var connection = e.connection;  // HyperConnection 对象
+						
+						if (!connection) return;
+						
+						// 弹出输入框编辑文字
+						var currentText = connection.getText() || '';
+						var promptText = editor.lang ? editor.lang.t('editconnectiontext', 'ui') : '输入连接线文字（留空则删除）:';
+						var newText = prompt(promptText, currentText);
+						
+						if (newText !== null) {
+							// 更新连接线文字
+							connection.setText(newText);
+							
+							// 触发内容变化事件
+							minder.fire('contentchange');
+						}
+					});
+				}
+
 				function onInit(editor, minder) {
 					scope.onInit({
 						editor: editor,
@@ -162,6 +212,12 @@ angular.module('kityminderEditor')
 					
 					// 设置拖拽文件处理
 					setupDragAndDrop(editor);
+					
+					// 设置 Delete 键删除连接线
+					setupHyperConnectionDelete(minder);
+					
+					// 设置双击连接线编辑文字
+					setupHyperConnectionEdit(minder, editor);
 				}
 
 				// debug 模式，采用seajs加载

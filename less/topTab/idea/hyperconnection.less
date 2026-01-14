@@ -1,0 +1,53 @@
+/**
+ * 连接线按钮样式
+ */
+.btn-group-vertical {
+    .hyperconnection, .hyperconnection-caption {
+        width: 40px;
+        margin: 0;
+        padding: 0;
+        border: none!important;
+        border-radius: 0!important;
+
+        &:hover {
+            background-color: @tool-hover;
+        }
+
+        &:active {
+            background-color: @tool-active;
+        }
+
+        &.active {
+            box-shadow: none;
+            background-color: @tool-hover;
+        }
+    }
+
+    .hyperconnection {
+        height: 25px;
+        position: relative;
+        
+        // 使用伪元素创建连接线图标
+        &::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15,3 21,3 21,9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    }
+
+    .hyperconnection-caption {
+        height: 20px;
+
+        .caption {
+            font-size: 12px;
+        }
+    }
+}

@@ -15,6 +15,7 @@ mod crypto;
 mod ai;
 mod window;
 
+#[cfg(target_os = "macos")]
 use tauri::Manager;
 
 // 重导出命令函数
@@ -75,21 +76,21 @@ pub fn run() {
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|app_handle, event| {
+        .run(|_app_handle, _event| {
             #[cfg(target_os = "macos")]
-            match event {
+            match _event {
                 tauri::RunEvent::Opened { urls } => {
                     for url in urls {
                         if url.scheme() == "file" {
                             if let Ok(path) = url.to_file_path() {
                                 let path_str = path.to_string_lossy();
-                                let _ = create_window(app_handle, Some(&path_str), false);
+                                let _ = create_window(_app_handle, Some(&path_str), false);
                             }
                         }
                     }
                 }
                 tauri::RunEvent::Ready => {
-                    let app_handle = app_handle.clone();
+                    let app_handle = _app_handle.clone();
                     tauri::async_runtime::spawn(async move {
                         // 延迟 300ms 等待可能的 Opened 事件触发
                         tokio::time::sleep(std::time::Duration::from_millis(300)).await;

@@ -187,7 +187,7 @@ module.exports = function(grunt) {
                         'bower_components/codemirror/lib/codemirror.css',
                         'bower_components/hotbox/hotbox.css',
                         'bower_components/color-picker/dist/color-picker.css',
-                        'node_modules/kityminder-core/dist/kityminder.core.css'
+                        'node_modules/tyminder-core/dist/kityminder.core.css'
                     ],
                     dest: 'dist/css'
                 }, {
@@ -211,7 +211,7 @@ module.exports = function(grunt) {
                         'bower_components/marked/lib/marked.js',
                         'node_modules/kity/dist/kity.js',
                         'bower_components/hotbox/hotbox.js',
-                        'node_modules/kityminder-core/dist/kityminder.core.js',
+                        'node_modules/tyminder-core/dist/kityminder.core.js',
                         'bower_components/color-picker/dist/color-picker.js',
                         'bower_components/js-base64/base64.min.js',
                         'bower_components/jszip/dist/jszip.min.js'

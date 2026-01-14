@@ -170,9 +170,12 @@ define(function(require, exports, module) {
                 'add': 'Add'
             },
             'link': 'Link',
+            'connection': 'Connection',
+            'editconnectiontext': 'Enter connection text (leave empty to remove):',
             'image': 'Image',
             'note': 'Note',
             'insertlink': 'Insert link',
+            'insertconnection': 'Add Connection',
             'insertimage': 'Insert image',
             'insertnote': 'Insert note',
             'removelink': 'Remove existing links',
